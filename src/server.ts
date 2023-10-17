@@ -1,21 +1,54 @@
-import bodyParser from "body-parser";
-import express, { Request, Response } from "express";
-import userRoutes from "./routes/userRoutes";
-
-const app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-const PORT = 3001;
-// for check the server status
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello, welcome to your server!");
+import { createServer, Server } from "http";
+import mysql from "mysql2/promise";
+import app from "./app";
+import config from "./config/index";
+// let mysqlConnection: Pool;
+process.on("uncaughtException", (error) => {
+  console.log(error);
+  process.exit(1);
 });
 
-// others
-app.use("/user", userRoutes);
+let server: Server;
 
-// listening
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+async function main() {
+  try {
+    const mysqlConnection = mysql.createPool({
+      host: config.database_url,
+      user: config.mysql_user,
+      password: config.mysql_password,
+      database: config.mysql_database,
+    });
+
+    console.log("🥌 Database connected successfully");
+
+    server = createServer(app);
+
+    app.set("mysqlConnection", mysqlConnection);
+
+    server.listen(config.port, () => {
+      console.log(`UMP listen on port ${config.port}`);
+    });
+  } catch (error) {
+    console.log(`Failed to connect database ${error}`);
+  }
+
+  process.on("unhandledRejection", (error) => {
+    if (server) {
+      server.close(() => {
+        console.log(error);
+        process.exit(1);
+      });
+    } else {
+      process.exit(1);
+    }
+  });
+}
+
+main();
+
+process.on("SIGABRT", () => {
+  console.log("SIGTERM is Received");
+  if (server) {
+    server.close();
+  }
 });
