@@ -10,7 +10,7 @@ export const createUser = (req: Request, res: Response) => {
     if (err) {
       res.status(400).send("Error in user signup");
     } else {
-      res.status(200).send("User signed up successfully done");
+      res.status(200).send("User signed up successfully");
     }
   });
 };
