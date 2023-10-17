@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Request, Response } from "express";
 import { db } from "../db";
 
 export const createUser = (req: Request, res: Response) => {
   const { username, full_name, email, role_id, password } = req.body;
   const user = { username, full_name, email, role_id, password };
-  const sql = "INSERT INTO users SET ?";
+  const sql = `INSERT INTO users SET ?`;
 
   db.query(sql, user, (err, result) => {
     if (err) {
