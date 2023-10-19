@@ -1,16 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Request, Response } from "express";
 import { db } from "../db";
 
 export const createUser = (req: Request, res: Response) => {
   const { username, full_name, email, role_id, password } = req.body;
   const user = { username, full_name, email, role_id, password };
-  const sql = "INSERT INTO users SET ?";
+  const sql = `INSERT INTO users SET ?`;
 
   db.query(sql, user, (err, result) => {
     if (err) {
       res.status(400).send("Error in user signup");
     } else {
-      res.status(200).send("User signed up successfully done");
+      res.status(200).send("User signed up successfully");
     }
   });
 };
