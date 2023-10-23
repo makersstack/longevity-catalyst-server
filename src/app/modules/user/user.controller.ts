@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import httpStatus from "http-status";
 import sendResponse from "../../../shared/sendResponse";
 import { IResponse, IUser } from "./user.interface";
-import { User } from "./user.model";
 import { userService } from "./user.services";
 
 // Create a new user
@@ -24,17 +23,32 @@ const createUser = async (req: Request, res: Response) => {
 };
 
 // Get all users
-async function getUsers(req: Request, res: Response) {
-  try {
-    const users = await User.findAll();
-    res.status(200).json(users);
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).json({ message: "Failed to fetch users" });
-  }
-}
+const getUsers = async (req: Request, res: Response) => {
+  const users = await userService.getUsers();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Users retrieved successfully",
+    data: users,
+  });
+};
+
+// For Single users
+const getUserByUserName = async (req: Request, res: Response) => {
+  const username = req.params.username;
+  const userDetails = await userService.getUserByUserName(username);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Users retrieved successfully",
+    data: userDetails,
+  });
+};
 
 export const UserController = {
   createUser,
   getUsers,
+  getUserByUserName,
 };

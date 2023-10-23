@@ -15,6 +15,29 @@ const createUser = async (
   }
 };
 
+// For all users
+const getUsers = async () => {
+  const users = await User.findAll({
+    attributes: { exclude: ["password"] },
+  });
+  return users;
+};
+
+// For Single User
+const getUserByUserName = async (username: string) => {
+  const user = await User.findOne({
+    where: { name: username },
+    attributes: { exclude: ["password"] },
+  });
+  if (!user) {
+    throw new Error("User Not Found");
+  }
+
+  return user;
+};
+
 export const userService = {
   createUser,
+  getUsers,
+  getUserByUserName,
 };
