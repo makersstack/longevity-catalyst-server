@@ -1,33 +1,40 @@
-import { Request, Response } from "express"; // Import the necessary types
-import app from "../../../app";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Request, Response } from "express";
+import httpStatus from "http-status";
+import sendResponse from "../../../shared/sendResponse";
+import { IResponse, IUser } from "./user.interface";
+import { User } from "./user.model";
+import { userService } from "./user.services";
 
-export const getUsers = (req: Request, res: Response) => {
-  const db = app.get("mysqlConnection");
-  const sql = "SELECT * FROM users";
+// Create a new user
+const createUser = async (req: Request, res: Response) => {
+  const userData: IUser = req.body;
 
-  // db.query(sql)
-  //   .then(err, rows, fields) => {
-  //     res.status(200).json(rows);
-  //   })
-  //   .catch((err) => {
-  //     console.error("Error in fetching users:", err);
-  //     res.status(500).send("Internal Server Error");
-  //   });
+  const user = await userService.createUser(userData);
+  const modifyData = user.dataValues;
 
-  db.query(sql, function (err: any, rows: any, fields: any) {
-    if (err) {
-      res.status(500).send(err);
-    } else if (rows) {
-      res.status(200).json(rows);
-    } else if (fields) {
-      res.status(200).json(fields);
-    }
+  const { password, ...userWithoutPassword } = modifyData;
+
+  sendResponse<IResponse>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User created successfully!",
+    data: userWithoutPassword,
   });
 };
 
-// export const getUsers = (req: Request, res: Response) => {
-//   const db = app.get("mysqlConnection");
-//   // console.log("mysqlConnection value:", db);
+// Get all users
+async function getUsers(req: Request, res: Response) {
+  try {
+    const users = await User.findAll();
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Failed to fetch users" });
+  }
+}
 
-//   res.status(200).json({ app: db });
-// };
+export const UserController = {
+  createUser,
+  getUsers,
+};
