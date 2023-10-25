@@ -1,33 +1,63 @@
-import { Request, Response } from "express"; // Import the necessary types
-import app from "../../../app";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Request, Response } from "express";
+import httpStatus from "http-status";
+import sendResponse from "../../../shared/sendResponse";
+import { UserSkillService } from "./user-skills/skills.service";
+import { IResponse, IUser } from "./user.interface";
+import { userService } from "./user.services";
 
-export const getUsers = (req: Request, res: Response) => {
-  const db = app.get("mysqlConnection");
-  const sql = "SELECT * FROM users";
+// Create a new user
+const createUser = async (req: Request, res: Response) => {
+  try {
+    const userData: IUser = req.body;
+    const user = await userService.createUser(userData);
+    const modifyData = user.dataValues;
 
-  // db.query(sql)
-  //   .then(err, rows, fields) => {
-  //     res.status(200).json(rows);
-  //   })
-  //   .catch((err) => {
-  //     console.error("Error in fetching users:", err);
-  //     res.status(500).send("Internal Server Error");
-  //   });
+    const { password, ...userWithoutPassword } = modifyData;
 
-  db.query(sql, function (err: any, rows: any, fields: any) {
-    if (err) {
-      res.status(500).send(err);
-    } else if (rows) {
-      res.status(200).json(rows);
-    } else if (fields) {
-      res.status(200).json(fields);
-    }
+    await UserSkillService.createUserSkill(
+      userWithoutPassword.id,
+      "Default Skill"
+    );
+
+    sendResponse<IResponse>(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "User created successfully!",
+      data: userWithoutPassword,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// Get all users
+const getUsers = async (req: Request, res: Response) => {
+  const users = await userService.getUsers();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Users retrieved successfully",
+    data: users,
   });
 };
 
-// export const getUsers = (req: Request, res: Response) => {
-//   const db = app.get("mysqlConnection");
-//   // console.log("mysqlConnection value:", db);
+// For Single users
+const getUserByUserName = async (req: Request, res: Response) => {
+  const username = req.params.username;
+  const userDetails = await userService.getUserByUserName(username);
 
-//   res.status(200).json({ app: db });
-// };
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Users retrieved successfully",
+    data: userDetails,
+  });
+};
+
+export const UserController = {
+  createUser,
+  getUsers,
+  getUserByUserName,
+};

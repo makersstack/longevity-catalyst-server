@@ -1,30 +1,17 @@
 import { createServer, Server } from "http";
-// import mysql from "mysql2/promise";
-import mysql from "mysql2";
 import app from "./app";
 import config from "./config/index";
-// let mysqlConnection: Pool;
-process.on("uncaughtException", (error) => {
-  console.log(error);
-  process.exit(1);
-});
+import sequelize from "./config/sequelize-config";
 
 let server: Server;
 
 async function main() {
   try {
-    const mysqlConnection = mysql.createPool({
-      host: config.database_url,
-      user: config.mysql_user,
-      password: config.mysql_password,
-      database: config.mysql_database,
-    });
-    console.log("🥌 Database pool Created");
+    await sequelize.sync();
     server = createServer(app);
-    app.set("mysqlConnection", mysqlConnection);
 
     server.listen(config.port, () => {
-      console.log(`UMP listen on port ${config.port}`);
+      console.log(`Lc listen on port ${config.port}`);
     });
   } catch (error) {
     console.log(`Failed to connect database ${error}`);
