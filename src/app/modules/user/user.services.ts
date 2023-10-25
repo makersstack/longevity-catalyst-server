@@ -1,18 +1,37 @@
-import { Optional } from "sequelize";
+import bcrypt from "bcrypt";
+import { Op, Optional } from "sequelize";
 import { NullishPropertiesOf } from "sequelize/types/utils";
+import config from "../../../config";
 import { IUser } from "./user.interface";
 import { User } from "./user.model";
-
 const createUser = async (
   userData: Optional<IUser, NullishPropertiesOf<IUser>> | undefined
 ) => {
-  try {
-    const user = await User.create(userData);
-
-    return user;
-  } catch (error) {
-    throw new Error("Failed to create user");
+  if (!userData?.password) {
+    throw new Error("Password is required to create a user");
   }
+  // Check if the username or email is already in use
+  const existingUser = await User.findOne({
+    where: {
+      [Op.or]: [{ username: userData.username }, { email: userData.email }],
+    },
+  });
+
+  if (existingUser) {
+    throw new Error("Username or email is already in use");
+  }
+
+  // Hash the password
+  const hashedPassword = await bcrypt.hash(
+    userData.password,
+    Number(config.bcrypt_salt_rounds)
+  );
+
+  userData.password = hashedPassword;
+
+  const user = await User.create(userData);
+
+  return user;
 };
 
 // For all users
@@ -26,7 +45,7 @@ const getUsers = async () => {
 // For Single User
 const getUserByUserName = async (username: string) => {
   const user = await User.findOne({
-    where: { name: username },
+    where: { username: username },
     attributes: { exclude: ["password"] },
   });
   if (!user) {

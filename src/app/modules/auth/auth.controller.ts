@@ -1,63 +1,57 @@
 import { Request, Response } from "express";
+import httpStatus from "http-status";
 import config from "../../../config";
 import sendResponse from "../../../shared/sendResponse";
+import {
+  ILoginUser,
+  ILoginUserResponse,
+  IRefreshTokenResponse,
+} from "./auth.interface";
+import { AuthService } from "./auth.service";
 
 const loginUser = async (req: Request, res: Response) => {
-  const { ...loginData } = req.body;
-  const result = await AuthService.loginUser(loginData);
-  const { refreshToken } = result;
-  // set refresh token into cookie
+  const payload: ILoginUser = req.body;
+
+  const result = await AuthService.loginUser(payload);
+  const { accessToken } = result;
+
+  // set access token into cookie
   const cookieOptions = {
     secure: config.env === "production",
     httpOnly: true,
   };
-
-  res.cookie("refreshToken", refreshToken, cookieOptions);
+  res.cookie("accessToken", accessToken, cookieOptions);
 
   sendResponse<ILoginUserResponse>(res, {
-    statusCode: 200,
+    statusCode: httpStatus.OK,
     success: true,
-    message: "User logged in successfully !",
+    message: "User logged in successfully!",
     data: result,
   });
 };
 
 const refreshToken = async (req: Request, res: Response) => {
-  const { refreshToken } = req.cookies;
+  const { accessToken } = req.cookies;
 
-  const result = await AuthService.refreshToken(refreshToken);
+  const result = await AuthService.refreshToken(accessToken);
 
-  // set refresh token into cookie
+  // Set the new access token into a cookie
+  const newAccessToken = result.accessToken;
   const cookieOptions = {
     secure: config.env === "production",
     httpOnly: true,
   };
-
-  res.cookie("refreshToken", refreshToken, cookieOptions);
+  res.cookie("accessToken", newAccessToken, cookieOptions);
 
   sendResponse<IRefreshTokenResponse>(res, {
     statusCode: 200,
     success: true,
-    message: "User logged in successfully !",
+    message: "Refresh token successfully extended!",
     data: result,
-  });
-};
-
-const changePassword = async (req: Request, res: Response) => {
-  const user = req.user;
-  const { ...passwordData } = req.body;
-
-  await AuthService.changePassword(user, passwordData);
-
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: "Password changed successfully !",
   });
 };
 
 export const AuthController = {
   loginUser,
   refreshToken,
-  changePassword,
 };

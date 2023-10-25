@@ -1,19 +1,48 @@
-// src/models/User.ts
-import { DataTypes, Model } from "sequelize";
+import bcrypt from "bcrypt";
+import { DataTypes, Model, Op } from "sequelize";
 import sequelize from "../../../config/sequelize-config";
-import { IUser } from "./user.interface";
 
-class User extends Model<IUser> {}
+class User extends Model {
+  static async isUserExist(identifier: string) {
+    return User.findOne({
+      where: {
+        [Op.or]: [{ username: identifier }, { email: identifier }],
+      },
+    });
+  }
+  async isPasswordMatch(password: string, hashedPassword: string) {
+    console.log("Calling isPasswordMatch with Password: ", password);
+    return bcrypt.compare(password, hashedPassword);
+  }
+}
+
 User.init(
   {
-    name: {
+    id: {
+      type: DataTypes.INTEGER,
+      unique: true,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
+    },
+    full_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    username: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
     },
+    role: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: "user",
+    },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
     password: {
       type: DataTypes.STRING,
@@ -39,9 +68,16 @@ User.init(
   {
     sequelize,
     modelName: "User",
-    tableName: "userss",
+    tableName: "users",
     timestamps: false,
   }
 );
+
+sequelize
+  .sync()
+  .then(() => {})
+  .catch((err) => {
+    console.error("Error creating User table:", err);
+  });
 
 export { User };

@@ -1,3 +1,4 @@
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { Application, NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
@@ -10,6 +11,7 @@ const app: Application = express();
 app.use(cors());
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -23,7 +25,7 @@ app.use("/api/v1", routers);
 sequelize
   .authenticate()
   .then(() => {
-    console.log("Sequelize connected to the database");
+    console.log("Server Connected");
   })
   .catch((error) => {
     console.error("Sequelize failed to connect to the database:", error);

@@ -11,7 +11,7 @@ async function main() {
     server = createServer(app);
 
     server.listen(config.port, () => {
-      console.log(`UMP listen on port ${config.port}`);
+      console.log(`Lc listen on port ${config.port}`);
     });
   } catch (error) {
     console.log(`Failed to connect database ${error}`);
