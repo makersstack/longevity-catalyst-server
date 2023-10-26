@@ -5,8 +5,8 @@ export const createProject = async (projectData: any) => {
   return Project.create(projectData);
 };
 
-export const updateProject = async (projectId: number, projectData: any) => {
-  const project = await Project.findByPk(projectId);
+export const updateProject = async (projectId: string, projectData: any) => {
+  const project = await Project.findByPk(Number(projectId));
   if (project) {
     await project.update(projectData);
     return project;
@@ -14,8 +14,8 @@ export const updateProject = async (projectId: number, projectData: any) => {
   return null;
 };
 
-export const deleteProject = async (projectId: number) => {
-  const project = await Project.findByPk(projectId);
+export const deleteProject = async (projectId: string) => {
+  const project = await Project.findByPk(Number(projectId));
   if (project) {
     await project.destroy();
     return project;
@@ -27,8 +27,8 @@ export const getAllProjects = async () => {
   return Project.findAll();
 };
 
-export const getSingleProject = async (projectId: number) => {
-  return Project.findByPk(projectId);
+export const getSingleProject = async (projectId: string) => {
+  return Project.findByPk(Number(projectId));
 };
 
 export const ProjectService = {

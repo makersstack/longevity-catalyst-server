@@ -9,7 +9,7 @@ Project.init(
       type: DataTypes.STRING,
     },
     postAuthInfo: {
-      type: DataTypes.JSONB,
+      type: DataTypes.TEXT,
     },
     projectTitle: {
       type: DataTypes.STRING,
@@ -24,13 +24,13 @@ Project.init(
       type: DataTypes.STRING,
     },
     requiredSkills: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
+      type: DataTypes.TEXT,
     },
     linksToRelevantData: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
+      type: DataTypes.TEXT,
     },
     linksToRelevantLiterature: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
+      type: DataTypes.TEXT,
     },
     additionalInformation: {
       type: DataTypes.TEXT,
@@ -39,7 +39,7 @@ Project.init(
       type: DataTypes.STRING,
     },
     keywords: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
+      type: DataTypes.TEXT,
     },
     onsiteRequirement: {
       type: DataTypes.STRING,
@@ -69,6 +69,7 @@ Project.init(
   {
     sequelize,
     modelName: "Project",
+    tableName: "projects",
   }
 );
 
