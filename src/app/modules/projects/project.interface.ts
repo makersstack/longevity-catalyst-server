@@ -1,4 +1,5 @@
 interface ProjectData {
+  id: number;
   projectTime: string;
   postAuthInfo: {
     profileImage: string;

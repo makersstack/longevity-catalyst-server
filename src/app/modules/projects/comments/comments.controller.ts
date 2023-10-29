@@ -1,19 +1,19 @@
 import { Request, Response } from "express";
 import httpStatus from "http-status";
-import ApiError from "../../../errors/ApiError";
-import catchAsync from "../../../shared/catchAsync";
-import sendResponse from "../../../shared/sendResponse";
-import { ProjectService } from "./project.services";
+import ApiError from "../../../../errors/ApiError";
+import catchAsync from "../../../../shared/catchAsync";
+import sendResponse from "../../../../shared/sendResponse";
+import { commentService } from "./comments.services";
 
-export const createProject = catchAsync(async (req: Request, res: Response) => {
+export const createComment = catchAsync(async (req: Request, res: Response) => {
   try {
-    const projectData = req.body;
-    const project = await ProjectService.createProject(projectData);
+    const commentData = req.body;
+    const result = await commentService.createComment(commentData);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Project Created successfully!",
-      data: project,
+      message: "Comment Created successfully!",
+      data: result,
     });
   } catch (error) {
     console.error(error);
@@ -21,11 +21,11 @@ export const createProject = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
-export const updateProject = catchAsync(async (req: Request, res: Response) => {
+export const updateComment = catchAsync(async (req: Request, res: Response) => {
   try {
     const projectId = req.params.id;
     const projectData = req.body;
-    const updatedProject = await ProjectService.updateProject(
+    const updatedProject = await commentService.updateComment(
       projectId,
       projectData
     );
@@ -45,10 +45,10 @@ export const updateProject = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
-export const deleteProject = catchAsync(async (req: Request, res: Response) => {
+export const deleteComment = catchAsync(async (req: Request, res: Response) => {
   try {
     const projectId = req.params.id;
-    const deletedProject = await ProjectService.deleteProject(projectId);
+    const deletedProject = await commentService.deleteComment(projectId);
     if (deletedProject) {
       res.status(204).end();
     } else {
@@ -60,23 +60,11 @@ export const deleteProject = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
-export const getAllProjects = catchAsync(
-  async (req: Request, res: Response) => {
-    try {
-      const projects = await ProjectService.getAllProjects();
-      res.status(200).json(projects);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  }
-);
-
-export const getSingleProject = catchAsync(
+export const getSingleComment = catchAsync(
   async (req: Request, res: Response) => {
     try {
       const projectId = req.params.id;
-      const project = await ProjectService.getSingleProject(projectId);
+      const project = await commentService.getSingleComment(projectId);
       if (project) {
         res.status(200).json(project);
       } else {
@@ -89,10 +77,9 @@ export const getSingleProject = catchAsync(
   }
 );
 
-export const projectController = {
-  createProject,
-  updateProject,
-  getAllProjects,
-  getSingleProject,
-  deleteProject,
+export const commentController = {
+  createComment,
+  updateComment,
+  deleteComment,
+  getSingleComment,
 };
