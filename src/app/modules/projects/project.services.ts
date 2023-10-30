@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Project from "./project.model";
 
-export const createProject = async (projectData: any) => {
+const createProject = async (projectData: any) => {
   return Project.create(projectData);
 };
 
-export const updateProject = async (projectId: string, projectData: any) => {
+const updateProject = async (projectId: string, projectData: any) => {
   const project = await Project.findByPk(Number(projectId));
   if (project) {
     await project.update(projectData);
@@ -14,7 +14,7 @@ export const updateProject = async (projectId: string, projectData: any) => {
   return null;
 };
 
-export const deleteProject = async (projectId: string) => {
+const deleteProject = async (projectId: string) => {
   const project = await Project.findByPk(Number(projectId));
   if (project) {
     await project.destroy();
@@ -23,11 +23,11 @@ export const deleteProject = async (projectId: string) => {
   return null;
 };
 
-export const getAllProjects = async () => {
+const getAllProjects = async () => {
   return Project.findAll();
 };
 
-export const getSingleProject = async (projectId: string) => {
+const getSingleProject = async (projectId: string) => {
   return Project.findByPk(Number(projectId));
 };
 

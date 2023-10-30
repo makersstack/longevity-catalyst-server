@@ -5,7 +5,7 @@ import catchAsync from "../../../../shared/catchAsync";
 import sendResponse from "../../../../shared/sendResponse";
 import { commentService } from "./comments.services";
 
-export const createComment = catchAsync(async (req: Request, res: Response) => {
+const createComment = catchAsync(async (req: Request, res: Response) => {
   try {
     const commentData = req.body;
     const result = await commentService.createComment(commentData);
@@ -21,7 +21,7 @@ export const createComment = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
-export const updateComment = catchAsync(async (req: Request, res: Response) => {
+const updateComment = catchAsync(async (req: Request, res: Response) => {
   try {
     const projectId = req.params.id;
     const projectData = req.body;
@@ -45,7 +45,7 @@ export const updateComment = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
-export const deleteComment = catchAsync(async (req: Request, res: Response) => {
+const deleteComment = catchAsync(async (req: Request, res: Response) => {
   try {
     const projectId = req.params.id;
     const deletedProject = await commentService.deleteComment(projectId);
@@ -60,22 +60,20 @@ export const deleteComment = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
-export const getSingleComment = catchAsync(
-  async (req: Request, res: Response) => {
-    try {
-      const projectId = req.params.id;
-      const project = await commentService.getSingleComment(projectId);
-      if (project) {
-        res.status(200).json(project);
-      } else {
-        res.status(404).json({ error: "Project not found" });
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
+const getSingleComment = catchAsync(async (req: Request, res: Response) => {
+  try {
+    const projectId = req.params.id;
+    const project = await commentService.getSingleComment(projectId);
+    if (project) {
+      res.status(200).json(project);
+    } else {
+      res.status(404).json({ error: "Project not found" });
     }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-);
+});
 
 export const commentController = {
   createComment,

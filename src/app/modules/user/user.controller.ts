@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import httpStatus from "http-status";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
-import { UserSkillService } from "./user-skills/skills.service";
+import { userSkillServices } from "./user-skills/skills.service";
 import { IResponse, IUser } from "./user.interface";
 import { userService } from "./user.services";
 
@@ -16,7 +16,7 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 
     const { password, ...userDetails } = modifyData;
 
-    await UserSkillService.createUserSkill(userDetails.id, "Default Skill");
+    await userSkillServices.createUserSkill(userDetails.id, "Default Skill");
 
     sendResponse<IResponse>(res, {
       statusCode: httpStatus.OK,

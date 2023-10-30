@@ -5,7 +5,7 @@ import catchAsync from "../../../../shared/catchAsync";
 import sendResponse from "../../../../shared/sendResponse";
 import { replyService } from "./reply.services";
 
-export const createProject = catchAsync(async (req: Request, res: Response) => {
+const createProject = catchAsync(async (req: Request, res: Response) => {
   try {
     const commentData = req.body;
     const comment = await replyService.createReply(commentData);
@@ -21,7 +21,7 @@ export const createProject = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
-export const updateReply = catchAsync(async (req: Request, res: Response) => {
+const updateReply = catchAsync(async (req: Request, res: Response) => {
   try {
     const projectId = req.params.id;
     const projectData = req.body;
@@ -42,7 +42,7 @@ export const updateReply = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
-export const deleteReply = catchAsync(async (req: Request, res: Response) => {
+const deleteReply = catchAsync(async (req: Request, res: Response) => {
   try {
     const projectId = req.params.id;
     const deletedProject = await replyService.deleteReply(projectId);
@@ -57,22 +57,20 @@ export const deleteReply = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
-export const getSingleReply = catchAsync(
-  async (req: Request, res: Response) => {
-    try {
-      const replyId = req.params.id;
-      const project = await replyService.getSingleProject(replyId);
-      if (project) {
-        res.status(200).json(project);
-      } else {
-        res.status(404).json({ error: "Project not found" });
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
+const getSingleReply = catchAsync(async (req: Request, res: Response) => {
+  try {
+    const replyId = req.params.id;
+    const project = await replyService.getSingleProject(replyId);
+    if (project) {
+      res.status(200).json(project);
+    } else {
+      res.status(404).json({ error: "Project not found" });
     }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-);
+});
 
 export const replyController = {
   createProject,
