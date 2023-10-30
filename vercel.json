@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "./src/server.ts",
+      "src": "/src/server.ts",
       "use": "@vercel/node"
     }
   ],
@@ -19,8 +19,8 @@
     "JWT_REFRESH_SECRET": "very-refresh-secret",
     "JWT_REFRESH_EXPIRES_IN": "365d"
   },
-  "rewrites": [
-    { "source": "/api/v1/(.*)", "destination": "/src/server.ts" },
-    { "source": "/(.*)", "destination": "/src/server.ts" }
+  "routes": [
+    { "src": "/api/v1/(.*)", "dest": "/src/server.ts" },
+    { "src": "/(.*)", "dest": "/src/server.ts" }
   ]
 }
