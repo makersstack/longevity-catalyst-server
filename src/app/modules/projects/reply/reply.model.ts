@@ -42,8 +42,3 @@ Reply.init(
 );
 
 export default Reply;
-// userId: string;
-// commentId: string;
-// reply: string;
-// createdAt: Date;
-// updatedAt: Date;
