@@ -8,7 +8,7 @@
   ],
   "env": {
     "NODE_ENV": "development",
-    "PORT": "3001",
+    "PORT": "3000",
     "MYSQL_HOST": "srv961.hstgr.io",
     "MYSQL_USER": "u790120223_lcuser",
     "MYSQL_PASSWORD": "jF]?EOAv5+",
