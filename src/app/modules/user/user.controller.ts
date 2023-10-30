@@ -3,8 +3,7 @@ import { Request, Response } from "express";
 import httpStatus from "http-status";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
-import { userSkillServices } from "./user-skills/skills.service";
-import { IResponse, IUser } from "./user.interface";
+import { IUser } from "./user.interface";
 import { userService } from "./user.services";
 
 // Create a new user
@@ -12,13 +11,12 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
   try {
     const userData: IUser = req.body;
     const user = await userService.createUser(userData);
+
     const modifyData = user.dataValues;
 
-    const { password, ...userDetails } = modifyData;
+    const userDetails = (({ password, ...rest }) => rest)(modifyData);
 
-    await userSkillServices.createUserSkill(userDetails.id, "Default Skill");
-
-    sendResponse<IResponse>(res, {
+    sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: "User created successfully!",

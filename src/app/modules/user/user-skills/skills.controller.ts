@@ -8,7 +8,7 @@ const createUserSkill = catchAsync(async (req: Request, res: Response) => {
     const { userId, skillName } = req.body;
     const userSkill = await userSkillServices.createUserSkill(
       userId,
-      skillName
+      skillName || "Default Skill"
     );
     return res.status(201).json(userSkill);
   } catch (error) {
@@ -16,10 +16,10 @@ const createUserSkill = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
-const getUserSkills = catchAsync(async (req: Request, res: Response) => {
+const getSingleUserSkill = catchAsync(async (req: Request, res: Response) => {
   try {
     const userId = parseInt(req.params.userId, 10);
-    const userSkills = await userSkillServices.getUserSkills(userId);
+    const userSkills = await userSkillServices.getSingleUserSkill(userId);
     return res.json(userSkills);
   } catch (error) {
     return res.status(500).json({ error: "Unable to fetch user skills." });
@@ -28,5 +28,5 @@ const getUserSkills = catchAsync(async (req: Request, res: Response) => {
 
 export const userSkillController = {
   createUserSkill,
-  getUserSkills,
+  getSingleUserSkill,
 };

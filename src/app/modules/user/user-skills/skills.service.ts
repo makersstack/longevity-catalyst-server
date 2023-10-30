@@ -6,13 +6,14 @@ const createUserSkill = async (
   skillName: string
 ): Promise<UserSkill> => {
   try {
-    const userSkill = await UserSkill.create({ userId, skillName });
-    return userSkill;
+    const userSkills = await UserSkill.create({ userId, skillName });
+    return userSkills;
   } catch (error) {
     throw new Error("Unable to create user skill.");
   }
 };
-const getUserSkills = async (userId: number): Promise<UserSkill[]> => {
+
+const getSingleUserSkill = async (userId: number): Promise<UserSkill[]> => {
   try {
     const userSkills = await UserSkill.findAll({ where: { userId } });
     return userSkills;
@@ -23,5 +24,5 @@ const getUserSkills = async (userId: number): Promise<UserSkill[]> => {
 
 export const userSkillServices = {
   createUserSkill,
-  getUserSkills,
+  getSingleUserSkill,
 };

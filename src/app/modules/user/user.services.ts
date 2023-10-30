@@ -1,15 +1,22 @@
 import bcrypt from "bcrypt";
+import httpStatus from "http-status";
 import { Op, Optional } from "sequelize";
 import { NullishPropertiesOf } from "sequelize/types/utils";
 import config from "../../../config";
+import ApiError from "../../../errors/ApiError";
 import { IUser } from "./user.interface";
 import { User } from "./user.model";
+
 const createUser = async (
   userData: Optional<IUser, NullishPropertiesOf<IUser>> | undefined
 ) => {
   if (!userData?.password) {
-    throw new Error("Password is required to create a user");
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Password is required to create a user"
+    );
   }
+
   // Check if the username or email is already in use
   const existingUser = await User.findOne({
     where: {
@@ -18,7 +25,10 @@ const createUser = async (
   });
 
   if (existingUser) {
-    throw new Error("Username or email is already in use");
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Username or email is already in use"
+    );
   }
 
   // Hash the password
