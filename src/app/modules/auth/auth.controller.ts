@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import httpStatus from "http-status";
 import config from "../../../config";
+import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import {
   ILoginUser,
@@ -9,7 +10,7 @@ import {
 } from "./auth.interface";
 import { AuthService } from "./auth.service";
 
-const loginUser = async (req: Request, res: Response) => {
+const loginUser = catchAsync(async (req: Request, res: Response) => {
   const payload: ILoginUser = req.body;
 
   const result = await AuthService.loginUser(payload);
@@ -28,9 +29,9 @@ const loginUser = async (req: Request, res: Response) => {
     message: "User logged in successfully!",
     data: result,
   });
-};
+});
 
-const refreshToken = async (req: Request, res: Response) => {
+const refreshToken = catchAsync(async (req: Request, res: Response) => {
   const { accessToken } = req.cookies;
 
   const result = await AuthService.refreshToken(accessToken);
@@ -49,7 +50,7 @@ const refreshToken = async (req: Request, res: Response) => {
     message: "Refresh token successfully extended!",
     data: result,
   });
-};
+});
 
 export const AuthController = {
   loginUser,

@@ -21,6 +21,7 @@ export type IResponse = {
   company?: string | null;
   bio?: string | null;
   profile_photo?: string | null;
+  // userSkills: string[];
   created_at: Date;
   updated_at: Date;
 };
