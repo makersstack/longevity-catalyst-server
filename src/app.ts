@@ -25,7 +25,7 @@ app.use("/api/v1", routers);
 sequelize
   .authenticate()
   .then(() => {
-    console.log("Server Connected");
+    console.log("Server Connected Success");
   })
   .catch((error) => {
     console.error("Sequelize failed to connect to the database:", error);
