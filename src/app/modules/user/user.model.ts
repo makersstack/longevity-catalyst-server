@@ -11,7 +11,6 @@ class User extends Model {
     });
   }
   async isPasswordMatch(password: string, hashedPassword: string) {
-    console.log("Calling isPasswordMatch with Password: ", password);
     return bcrypt.compare(password, hashedPassword);
   }
 }

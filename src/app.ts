@@ -1,6 +1,6 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import express, { Application, NextFunction, Request, Response } from "express";
+import express, { Application, Request, Response } from "express";
 import httpStatus from "http-status";
 
 import routers from "./app/routes";
@@ -8,9 +8,14 @@ import sequelize from "./config/sequelize-config";
 
 const app: Application = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
 
 app.use(express.json());
+
 app.use(cookieParser());
 
 app.use(express.urlencoded({ extended: true }));
@@ -32,10 +37,10 @@ sequelize
   });
 
 // Handle Not Found
-app.use((req: Request, res: Response, next: NextFunction) => {
+app.use((req: Request, res: Response) => {
   res.status(httpStatus.NOT_FOUND).json({
     success: false,
-    message: "Not Found",
+    message: "Not Found Maker",
     errorMessages: [
       {
         path: req.originalUrl,
@@ -43,7 +48,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
       },
     ],
   });
-  next();
+  // next();
 });
 
 export default app;

@@ -27,6 +27,8 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
     },
   });
 
+  console.log("Here is the user", user);
+
   if (!user) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
@@ -44,7 +46,9 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Invalid credentials");
   }
 
-  const { id: userId, role: userRole } = user;
+  const { id: userId, role: userRole } = user as any;
+
+  console.log("check this and static value", userId, userRole);
 
   const accessToken = jwtHelpers.createToken(
     { userId, userRole },
@@ -110,8 +114,8 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
   // Generate a new access token
   const newAccessToken = jwtHelpers.createToken(
     {
-      userId: isUserExist.id,
-      role: isUserExist.role,
+      userId: (isUserExist as any).id,
+      role: (isUserExist as any).role,
     },
     config.jwt.secret as Secret,
     config.jwt.expires_in as string
