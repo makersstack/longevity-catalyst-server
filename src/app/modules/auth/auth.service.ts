@@ -11,7 +11,6 @@ import {
   ILoginUserResponse,
   IRefreshTokenResponse,
 } from "./auth.interface";
-import RefreshToken from "./refreshToken.model";
 
 const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   const { identifier, password } = payload;
@@ -26,8 +25,6 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
       [Op.or]: [{ email: identifier }, { username: identifier }],
     },
   });
-
-  console.log("Here is the user", user);
 
   if (!user) {
     throw new ApiError(
@@ -48,8 +45,6 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
 
   const { id: userId, role: userRole } = user as any;
 
-  console.log("check this and static value", userId, userRole);
-
   const accessToken = jwtHelpers.createToken(
     { userId, userRole },
     config.jwt.secret as Secret,
@@ -61,28 +56,6 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
     config.jwt.refresh_secret as Secret,
     config.jwt.refresh_expires_in as string
   );
-
-  // Check if there is an existing refresh token for the user
-  // eslint-disable-next-line prefer-const
-  let existingRefreshToken = await RefreshToken.findOne({
-    where: { userId: userId },
-  });
-
-  const twoHoursInMilliseconds = 2 * 60 * 60 * 1000;
-  const expirationDate = new Date(Date.now() + twoHoursInMilliseconds);
-
-  if (existingRefreshToken) {
-    existingRefreshToken.token = refreshToken;
-    existingRefreshToken.expiresAt = expirationDate;
-    await existingRefreshToken.save();
-  } else {
-    await RefreshToken.create({
-      userId: userId,
-      token: refreshToken,
-      expiresAt: expirationDate,
-      createdAt: new Date(),
-    });
-  }
 
   return {
     accessToken,

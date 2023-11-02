@@ -1,21 +1,30 @@
-/* eslint-disable no-undef */
 import path from "path";
 import { createLogger, format, transports } from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
-const { combine, timestamp, label, printf } = format;
-
-//Customm Log Format
+const { combine, timestamp, label, printf, prettyPrint } = format;
+// Function Declaretion
 const myFormat = printf(({ level, message, label, timestamp }) => {
   const date = new Date(timestamp);
-  const hour = date.getHours();
+  let hour = date.getHours();
   const minutes = date.getMinutes();
   const seconds = date.getSeconds();
-  return `${date.toDateString()} ${hour}:${minutes}:${seconds} } [${label}] ${level}: ${message}`;
+  let meridiem = "AM";
+  if (hour > 12) {
+    hour -= 12;
+    meridiem = "PM";
+  }
+
+  return `${date.toDateString()} ${hour}:${minutes}:${seconds}:${meridiem} [${label}] ${level}: ${message}`;
 });
 
 const logger = createLogger({
   level: "info",
-  format: combine(label({ label: "PH" }), timestamp(), myFormat),
+  format: combine(
+    label({ label: "LC Application!" }),
+    timestamp(),
+    myFormat,
+    prettyPrint()
+  ),
   transports: [
     new transports.Console(),
     new DailyRotateFile({
@@ -26,7 +35,7 @@ const logger = createLogger({
         "successes",
         "phu-%DATE%-success.log"
       ),
-      datePattern: "YYYY-DD-MM-HH",
+      datePattern: "YYYY-MM-DD-HH",
       zippedArchive: true,
       maxSize: "20m",
       maxFiles: "14d",
@@ -36,9 +45,13 @@ const logger = createLogger({
 
 const errorlogger = createLogger({
   level: "error",
-  format: combine(label({ label: "PH" }), timestamp(), myFormat),
+  format: combine(
+    label({ label: "Error Log!" }),
+    timestamp(),
+    myFormat,
+    prettyPrint()
+  ),
   transports: [
-    new transports.Console(),
     new DailyRotateFile({
       filename: path.join(
         process.cwd(),
@@ -47,13 +60,13 @@ const errorlogger = createLogger({
         "errors",
         "phu-%DATE%-error.log"
       ),
-      datePattern: "YYYY-DD-MM-HH",
+      datePattern: "YYYY-MM-DD-HH",
       zippedArchive: true,
       maxSize: "20m",
       maxFiles: "14d",
     }),
+    new transports.Console(),
   ],
 });
 
 export { errorlogger, logger };
-
