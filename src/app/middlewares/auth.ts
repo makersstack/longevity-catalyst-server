@@ -18,10 +18,6 @@ const auth =
       // verify token
       let verifiedUser = null;
 
-      verifiedUser = jwtHelpers.verifyToken(token, config.jwt.secret as Secret);
-
-      req.user = verifiedUser; // role  , userid
-
       // role diye guard korar jnno
       if (
         requiredRoles.length &&
@@ -34,5 +30,7 @@ const auth =
       next(error);
     }
   };
+
+
 
 export default auth;
