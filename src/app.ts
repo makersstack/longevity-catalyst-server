@@ -1,16 +1,23 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import express, { Application, NextFunction, Request, Response } from "express";
+import express, { Application } from "express";
 import httpStatus from "http-status";
 
+import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 import routers from "./app/routes";
 import sequelize from "./config/sequelize-config";
+import { errorlogger, logger } from "./shared/logger";
 
 const app: Application = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
 
 app.use(express.json());
+
 app.use(cookieParser());
 
 app.use(express.urlencoded({ extended: true }));
@@ -20,30 +27,27 @@ app.set("mysqlConnection", null);
 // Application routes
 app.use("/api/v1", routers);
 
-// app.use(globalErrorHandler);
+app.use(globalErrorHandler);
 
 sequelize
   .authenticate()
   .then(() => {
-    console.log("Server Connected Success");
+    logger.info(`🛢 Database is connected successfull`);
   })
   .catch((error) => {
-    console.error("Sequelize failed to connect to the database:", error);
+    errorlogger.error("Sequelize failed to connect to the database:", error);
   });
 
 // Handle Not Found
-app.use((req: Request, res: Response, next: NextFunction) => {
+app.use((req, res) => {
   res.status(httpStatus.NOT_FOUND).json({
     success: false,
-    message: "Not Found",
-    errorMessages: [
-      {
-        path: req.originalUrl,
-        message: "API Not Found",
-      },
-    ],
+    message: "Resource not found",
+    error: {
+      path: req.originalUrl,
+      message: "The requested API route does not exist.",
+    },
   });
-  next();
 });
 
 export default app;

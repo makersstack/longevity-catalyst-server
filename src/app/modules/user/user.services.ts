@@ -59,7 +59,7 @@ const getUserByUserName = async (username: string) => {
     attributes: { exclude: ["password"] },
   });
   if (!user) {
-    throw new Error("User Not Found");
+    throw new ApiError(httpStatus.BAD_REQUEST, "User Not Found");
   }
 
   return user;

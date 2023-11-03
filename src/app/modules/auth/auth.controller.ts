@@ -14,14 +14,16 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   const payload: ILoginUser = req.body;
 
   const result = await AuthService.loginUser(payload);
-  const { accessToken } = result;
+
+  const { refreshToken } = result;
 
   // set access token into cookie
   const cookieOptions = {
     secure: config.env === "production",
     httpOnly: true,
   };
-  res.cookie("accessToken", accessToken, cookieOptions);
+
+  res.cookie("refreshToken", refreshToken, cookieOptions);
 
   sendResponse<ILoginUserResponse>(res, {
     statusCode: httpStatus.OK,
@@ -32,17 +34,16 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const refreshToken = catchAsync(async (req: Request, res: Response) => {
-  const { accessToken } = req.cookies;
+  const { refreshToken } = req.cookies;
 
-  const result = await AuthService.refreshToken(accessToken);
+  const result = await AuthService.refreshToken(refreshToken);
 
-  // Set the new access token into a cookie
-  const newAccessToken = result.accessToken;
   const cookieOptions = {
     secure: config.env === "production",
     httpOnly: true,
   };
-  res.cookie("accessToken", newAccessToken, cookieOptions);
+
+  res.cookie("refreshToken", refreshToken, cookieOptions);
 
   sendResponse<IRefreshTokenResponse>(res, {
     statusCode: 200,
