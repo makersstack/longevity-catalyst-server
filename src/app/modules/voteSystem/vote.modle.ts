@@ -4,8 +4,8 @@ import VoteAttributes from "./vote.interface";
 class VoteModel extends Model {
   public id!: number;
   public userId!: number;
-  public votedItemId!: number; // You can change this to match your voted items, e.g., a comment or a project
-  public voteType!: "up" | "down"; // You can customize the vote types
+  public projectId!: number;
+  public voteType!: "up" | "down";
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -17,7 +17,7 @@ const defineVoteModel = (sequelize: Sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      votedItemId: {
+      projectId: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
@@ -36,4 +36,4 @@ const defineVoteModel = (sequelize: Sequelize) => {
 
 interface VoteInstance extends Model<VoteAttributes>, VoteAttributes {}
 
-export { VoteInstance, defineVoteModel };
+export { VoteInstance, VoteModel, defineVoteModel };

@@ -5,6 +5,6 @@ const router = express.Router();
 
 // Define routes
 router.post("/", likeController.createLike);
-router.get("/", likeController.createLike);
+router.get("/", likeController.getAllLikes);
 
 export const LikeRouter = router;

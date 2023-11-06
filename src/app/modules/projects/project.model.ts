@@ -1,18 +1,33 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../config/sequelize-config";
 
-class Project extends Model {}
+class Project extends Model {
+  [x: string]: any;
+  static async findProjectById(id: number) {
+    return Project.findByPk(id);
+  }
+}
 
 Project.init(
   {
+    id: {
+      type: DataTypes.INTEGER,
+      unique: true,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
+    },
     projectTime: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
     postAuthInfo: {
       type: DataTypes.TEXT,
     },
     projectTitle: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
     projectDescription: {
       type: DataTypes.TEXT,
@@ -65,12 +80,26 @@ Project.init(
     projectSubmitted: {
       type: DataTypes.STRING,
     },
+    upVoteCount: {
+      type: DataTypes.INTEGER,
+    },
+    downVoteCount: {
+      type: DataTypes.INTEGER,
+    },
   },
   {
     sequelize,
     modelName: "Project",
     tableName: "projects",
+    timestamps: false,
   }
 );
 
-export default Project;
+sequelize
+  .sync()
+  .then(() => {})
+  .catch((err) => {
+    console.error("Error creating Project table:", err);
+  });
+
+export { Project };

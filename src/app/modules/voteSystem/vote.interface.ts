@@ -1,7 +1,7 @@
 interface VoteAttributes {
   id: number;
   userId: number;
-  votedItemId: number;
+  projectId: number;
   voteType: "up" | "down";
   createdAt: Date;
   updatedAt: Date;
