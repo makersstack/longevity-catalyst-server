@@ -19,12 +19,7 @@ const myFormat = printf(({ level, message, label, timestamp }) => {
 
 const logger = createLogger({
   level: "info",
-  format: combine(
-    label({ label: "LC Application!" }),
-    timestamp(),
-    myFormat,
-    prettyPrint()
-  ),
+  format: combine(timestamp(), myFormat, prettyPrint()),
   transports: [
     new transports.Console(),
     new DailyRotateFile({
@@ -46,7 +41,7 @@ const logger = createLogger({
 const errorlogger = createLogger({
   level: "error",
   format: combine(
-    label({ label: "Error Log!" }),
+    label({ label: "This is and server error!" }),
     timestamp(),
     myFormat,
     prettyPrint()

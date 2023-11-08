@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { DataTypes, Model, Op } from "sequelize";
 import sequelize from "../../../config/sequelize-config";
+import { errorlogger } from "../../../shared/logger";
 
 class User extends Model {
   static async isUserExist(identifier: string) {
@@ -76,7 +77,7 @@ sequelize
   .sync()
   .then(() => {})
   .catch((err) => {
-    console.error("Error creating User table:", err);
+    errorlogger.error("Error creating User table:", err);
   });
 
 export { User };
