@@ -15,12 +15,13 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 
   const result = await AuthService.loginUser(payload);
 
-  const { refreshToken } = result;
+  const { refreshToken, ...others } = result;
 
   // set access token into cookie
   const cookieOptions = {
-    secure: config.env === "production",
+    // secure: config.env === "production",
     httpOnly: true,
+    secure: false,
   };
 
   res.cookie("refreshToken", refreshToken, cookieOptions);
@@ -29,7 +30,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "User logged in successfully!",
-    data: result,
+    data: others,
   });
 });
 

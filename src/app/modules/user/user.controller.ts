@@ -12,6 +12,7 @@ const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userData: IUser = req.body;
+      console.log(userData);
       const user = await userService.createUser(userData);
 
       const modifyData = user.dataValues;
