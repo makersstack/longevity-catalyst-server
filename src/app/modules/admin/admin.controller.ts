@@ -13,7 +13,7 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
   if (!result) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Solve the issu");
   }
-  const { id, password, ...othersData } = result;
+  const { password, ...othersData } = result;
 
   sendResponse<AdminResponse>(res, {
     statusCode: httpStatus.OK,

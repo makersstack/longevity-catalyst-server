@@ -1,4 +1,4 @@
-import mysql2 from "mysql2"; // update
+import * as mysql2 from "mysql2"; // update
 import { Sequelize } from "sequelize";
 import config from "./index";
 

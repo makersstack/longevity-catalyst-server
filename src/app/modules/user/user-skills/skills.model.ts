@@ -1,4 +1,3 @@
-// user-skill.model.ts
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../../config/sequelize-config";
 import { User } from "../user.model";
@@ -18,13 +17,19 @@ UserSkill.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: User,
-        key: "id",
+        model: User, // Refer to the User model
+        key: "id", // Use the primary key of the User model
       },
     },
     skillName: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
+      get() {
+        return JSON.parse(this.getDataValue("skillName"));
+      },
+      set(value) {
+        this.setDataValue("skillName", JSON.stringify(value));
+      },
     },
   },
   {
@@ -35,11 +40,6 @@ UserSkill.init(
   }
 );
 
-sequelize
-  .sync()
-  .then(() => {})
-  .catch((err) => {
-    console.error("Error creating User table:", err);
-  });
+UserSkill.belongsTo(User, { foreignKey: "userId" });
 
 export { UserSkill };

@@ -4,38 +4,55 @@ import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
-import { IUser } from "./user.interface";
+import { IResponse, IUser } from "./user.interface";
 import { userService } from "./user.services";
 
 // Create a new user
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userData: IUser = req.body;
+    const userData: IUser = req.body;
 
-      const user = await userService.createUser(userData);
+    const result = await userService.createUser(userData);
 
-      const modifyData = user.dataValues;
-
-      const userDetails = (({ password, ...rest }) => rest)(modifyData);
-
-      sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: "User created successfully!",
-        data: userDetails,
-      });
-    } catch (error) {
-      throw new ApiError(httpStatus.BAD_GATEWAY, `${error}:`);
+    if (!result) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "This error for controller get null"
+      );
     }
+
+    const { password, ...otersData } = result;
+
+    sendResponse<IResponse>(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "User created successfully!",
+      data: otersData,
+    });
   }
 );
+const updateUser = catchAsync(async (req: Request, res: Response) => {
+  const userName = req.params.username;
+  const updateData = req.body;
+  const userDetails = await userService.updateUser(userName, updateData);
 
+  if (!userDetails) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "User data not updated");
+  }
+  const { password, ...userData } = userDetails;
+
+  sendResponse<IResponse>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Users retrieved successfully",
+    data: userData,
+  });
+});
 // Get all users
-const getUsers = catchAsync(async (req: Request, res: Response) => {
-  const users = await userService.getUsers();
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const users = await userService.getAllUsers();
 
-  sendResponse(res, {
+  sendResponse<IResponse[]>(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Users retrieved successfully",
@@ -45,10 +62,10 @@ const getUsers = catchAsync(async (req: Request, res: Response) => {
 
 // For Single users
 const getUserByUserName = catchAsync(async (req: Request, res: Response) => {
-  const username = req.params.username;
-  const userDetails = await userService.getUserByUserName(username);
+  const userName = req.params.username;
+  const userDetails = await userService.getUserByUserName(userName);
 
-  sendResponse(res, {
+  sendResponse<IResponse>(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Users retrieved successfully",
@@ -58,6 +75,7 @@ const getUserByUserName = catchAsync(async (req: Request, res: Response) => {
 
 export const UserController = {
   createUser,
-  getUsers,
+  updateUser,
+  getAllUsers,
   getUserByUserName,
 };

@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
 import { DataTypes, Model, Op } from "sequelize";
 import sequelize from "../../../config/sequelize-config";
-import { errorlogger } from "../../../shared/logger";
+import { IUser } from "./user.interface";
 
-class User extends Model {
+class User extends Model<IUser> {
   static async isUserExist(identifier: string) {
     return User.findOne({
       where: {
@@ -57,27 +57,26 @@ User.init(
     profile_photo: {
       type: DataTypes.STRING,
     },
-    created_at: {
+    createdAt: {
       type: DataTypes.DATE,
+      allowNull: false,
       defaultValue: DataTypes.NOW,
     },
-    updated_at: {
+    updatedAt: {
       type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
   },
   {
     sequelize,
     modelName: "User",
     tableName: "users",
-    timestamps: false,
+    timestamps: true,
   }
 );
 
-sequelize
-  .sync()
-  .then(() => {})
-  .catch((err) => {
-    errorlogger.error("Error creating User table:", err);
-  });
+// User.hasOne(UserSkill, { foreignKey: "UserId" });
+// User.hasOne(UserSocail, { foreignKey: "UserId" });
 
 export { User };
