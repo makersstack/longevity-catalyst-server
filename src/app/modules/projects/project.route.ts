@@ -9,15 +9,7 @@ const router = express.Router();
 router.get("/", projectController.getAllProjects);
 router.get("/:id", projectController.getSingleProject);
 
-router.post(
-  "/create-project",
-  auth(
-    ENUM_USER_ROLE.REGULARUSER,
-    ENUM_USER_ROLE.CONTRIBUTOR,
-    ENUM_USER_ROLE.ADMIN
-  ),
-  projectController.createProject
-);
+router.post("/create-project", projectController.createProject);
 router.delete(
   "/:id",
   auth(

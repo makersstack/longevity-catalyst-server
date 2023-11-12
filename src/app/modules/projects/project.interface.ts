@@ -1,4 +1,4 @@
-interface ProjectData {
+export interface ProjectData {
   id: number;
   projectTime: string;
   postAuthInfo: {
@@ -28,4 +28,6 @@ interface ProjectData {
   downVoteCount: number;
 }
 
-export default ProjectData;
+export type IProjectFilters = {
+  searchTerm?: string;
+};

@@ -1,21 +1,38 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
+import { jwtHelpers } from "../../../helpers/jwtHelpers";
 import { LikeModel } from "./like.model";
 
-const createLike = async (likeData: any) => {
-  const { userId, likedItemId } = likeData;
-
-  if (!userId || !likedItemId) {
+const createOrRemoveLike = async (token: string, postId: any) => {
+  const userInfo = jwtHelpers.getUserInfoByToken(token);
+  if (!userInfo) {
     throw new ApiError(httpStatus.NOT_FOUND, "Error creating like");
   }
 
-  const like = await LikeModel.create(likeData);
+  const { userId, role } = userInfo;
+  if (!userId || !postId || !role) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Error creating like");
+  }
+  // Checking for like
+  const existingLike = await LikeModel.findOne({ where: { userId, postId } });
 
-  return like;
+  if (existingLike) {
+    await LikeModel.destroy();
+    return false;
+  } else {
+    const likeData = {
+      userId,
+      postId,
+    };
+    await LikeModel.create(likeData);
+
+    return likeData;
+  }
 };
 
-const getAllLikes = async (projectId: any) => {
+const getAllLikesByPost = async (projectId: any) => {
   const result = await LikeModel.findAll({
     where: { likedItemId: projectId },
   });
@@ -23,7 +40,26 @@ const getAllLikes = async (projectId: any) => {
   return result;
 };
 
+const getAllLikesByUser = async (token: string) => {
+  const userInfo = jwtHelpers.getUserInfoByToken(token);
+  if (!userInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Error creating like");
+  }
+
+  const { userId, role } = userInfo;
+  if (!userId || !role) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "User are no likes");
+  }
+
+  const result = await LikeModel.findAll({
+    where: { userId },
+  });
+
+  return result;
+};
+
 export const likeService = {
-  createLike,
-  getAllLikes,
+  createOrRemoveLike,
+  getAllLikesByPost,
+  getAllLikesByUser,
 };

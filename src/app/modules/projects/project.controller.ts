@@ -1,24 +1,25 @@
-import { Request, Response } from "express";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
+import { paginationFileds } from "../../../constants/pagination";
 import ApiError from "../../../errors/ApiError";
 import catchAsync from "../../../shared/catchAsync";
+import pick from "../../../shared/pick";
 import sendResponse from "../../../shared/sendResponse";
+import { projectFilterableFields } from "./project.constant";
 import { ProjectService } from "./project.services";
 
 const createProject = catchAsync(async (req: Request, res: Response) => {
-  try {
-    const projectData = req.body;
-    const project = await ProjectService.createProject(projectData);
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "Project Created successfully!",
-      data: project,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+  const projectData = req.body;
+
+  const project = await ProjectService.createProject(projectData);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Project Created successfully!",
+    data: project,
+  });
 });
 
 const updateProject = catchAsync(async (req: Request, res: Response) => {
@@ -60,15 +61,25 @@ const deleteProject = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
-const getAllProjects = catchAsync(async (req: Request, res: Response) => {
-  try {
-    const projects = await ProjectService.getAllProjects();
-    res.status(200).json(projects);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+const getAllProjects = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const filters = pick(req.query, projectFilterableFields);
+    const paginationOptions = pick(req.query, paginationFileds);
+
+    const result = await ProjectService.getAllProjects(
+      filters,
+      paginationOptions
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Projects retrieved successfully",
+      meta: result.meta,
+      data: result.data,
+    });
   }
-});
+);
 
 const getSingleProject = catchAsync(async (req: Request, res: Response) => {
   try {

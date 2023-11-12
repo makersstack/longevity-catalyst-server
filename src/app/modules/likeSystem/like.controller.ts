@@ -1,31 +1,48 @@
 import { Request, Response } from "express";
 import httpStatus from "http-status";
+import ApiError from "../../../errors/ApiError";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
-import { LikeInstance } from "./like.model";
 import { likeService } from "./like.services";
 
-const createLike = catchAsync(async (req: Request, res: Response) => {
-  try {
-    const likeData: LikeInstance = req.body;
-
-    const result = await likeService.createLike(likeData);
-
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "Users retrieved successfully",
-      data: result,
-    });
-  } catch (error) {
-    console.log(error);
+const createOrRemoveLike = catchAsync(async (req: Request, res: Response) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Sorry");
   }
+
+  const postId = req.params;
+
+  const result = await likeService.createOrRemoveLike(token, postId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Users retrieved successfully",
+    data: result,
+  });
 });
 
-const getAllLikes = catchAsync(async (req: Request, res: Response) => {
+const getAllLikesByPost = catchAsync(async (req: Request, res: Response) => {
   const { projectId } = req.params;
 
-  const getLikes = await likeService.getAllLikes(projectId);
+  const getLikes = await likeService.getAllLikesByPost(projectId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "retrieved successfully",
+    data: getLikes,
+  });
+});
+
+const getAllLikesByUser = catchAsync(async (req: Request, res: Response) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Sorry");
+  }
+
+  const getLikes = await likeService.getAllLikesByUser(token);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -36,6 +53,7 @@ const getAllLikes = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const likeController = {
-  createLike,
-  getAllLikes,
+  createOrRemoveLike,
+  getAllLikesByPost,
+  getAllLikesByUser,
 };
