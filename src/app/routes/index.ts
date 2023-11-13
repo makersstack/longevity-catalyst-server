@@ -5,6 +5,7 @@ import { commentRoute } from "../modules/projects/comments/comments.route";
 import { ProjectRouter } from "../modules/projects/project.route";
 import { replyRoute } from "../modules/projects/reply/reply.route";
 import { userSkillRoute } from "../modules/user/user-skills/skills.route";
+import { userSocailRoute } from "../modules/user/user-socail/socail.router";
 import { UserRoutes } from "../modules/user/user.router";
 
 const router = express.Router();
@@ -24,6 +25,10 @@ const moduleRoutes = [
   {
     path: "/skills",
     route: userSkillRoute,
+  },
+  {
+    path: "/socail",
+    route: userSocailRoute,
   },
   {
     path: "/projects",

@@ -27,6 +27,7 @@ AdminModel.init(
     role: {
       type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: "admin",
     },
   },
   {

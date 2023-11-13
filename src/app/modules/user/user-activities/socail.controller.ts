@@ -1,4 +1,3 @@
-// user-skill.controller.ts
 import { Request, Response } from "express";
 import httpStatus from "http-status";
 import { Secret } from "jsonwebtoken";
@@ -7,12 +6,12 @@ import ApiError from "../../../../errors/ApiError";
 import { jwtHelpers } from "../../../../helpers/jwtHelpers";
 import catchAsync from "../../../../shared/catchAsync";
 import sendResponse from "../../../../shared/sendResponse";
-import { userSkillServices } from "./skills.service";
+import { IUserSocailInterface } from "./socail.interface";
+import { userSocailServices } from "./socail.services";
 
-const createUserSkill = catchAsync(async (req: Request, res: Response) => {
-  const { skillName } = req.body;
+const createSocailLinks = catchAsync(async (req: Request, res: Response) => {
+  const { socailLinks } = req.body;
   const token = req.headers.authorization;
-
   if (!token) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized");
   }
@@ -23,16 +22,19 @@ const createUserSkill = catchAsync(async (req: Request, res: Response) => {
   );
 
   const { userId } = varifyedToken;
-  const userSkill = await userSkillServices.createUserSkill(userId, skillName);
+  const userSocial = await userSocailServices.createSocailLinks(
+    userId,
+    socailLinks
+  );
 
-  sendResponse(res, {
+  sendResponse<IUserSocailInterface>(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Skill Create Successfull",
-    data: userSkill,
+    message: "Socail Link added",
+    data: userSocial,
   });
 });
 
-export const userSkillController = {
-  createUserSkill,
+export const userSocailController = {
+  createSocailLinks,
 };

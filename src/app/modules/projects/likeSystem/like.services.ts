@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from "http-status";
-import ApiError from "../../../errors/ApiError";
-import { jwtHelpers } from "../../../helpers/jwtHelpers";
+import ApiError from "../../../../errors/ApiError";
+import { jwtHelpers } from "../../../../helpers/jwtHelpers";
 import { LikeModel } from "./like.model";
 
 const createOrRemoveLike = async (token: string, postId: any) => {

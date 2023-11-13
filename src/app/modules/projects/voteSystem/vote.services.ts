@@ -1,7 +1,7 @@
 import httpStatus from "http-status";
-import ApiError from "../../../errors/ApiError";
-import { jwtHelpers } from "../../../helpers/jwtHelpers";
-import { Project } from "../projects/project.model";
+import ApiError from "../../../../errors/ApiError";
+import { jwtHelpers } from "../../../../helpers/jwtHelpers";
+import { Project } from "../project.model";
 import { VoteModel } from "./vote.modle";
 
 const createOrRemoveVote = async (voteData: {

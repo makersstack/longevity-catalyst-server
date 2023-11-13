@@ -2,9 +2,9 @@ import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../../config/sequelize-config";
 import { User } from "../user.model";
 
-class UserSkill extends Model {}
+class UserSocail extends Model {}
 
-UserSkill.init(
+UserSocail.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -21,25 +21,25 @@ UserSkill.init(
         key: "id",
       },
     },
-    skillName: {
-      type: DataTypes.TEXT,
+    socailLinks: {
+      type: DataTypes.STRING,
       allowNull: false,
       get() {
-        return JSON.parse(this.getDataValue("skillName"));
+        return JSON.parse(this.getDataValue("socailLinks"));
       },
       set(value) {
-        this.setDataValue("skillName", JSON.stringify(value));
+        this.setDataValue("socailLinks", JSON.stringify(value));
       },
     },
   },
   {
     sequelize,
-    modelName: "UserSkill",
-    tableName: "user_skills",
+    modelName: "UserSocail",
+    tableName: "user_socail",
     timestamps: false,
   }
 );
 
-UserSkill.belongsTo(User, { foreignKey: "userId" });
+UserSocail.belongsTo(User, { as: "User", foreignKey: "userId" });
 
-export { UserSkill };
+export { UserSocail };

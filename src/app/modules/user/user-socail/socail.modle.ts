@@ -18,12 +18,18 @@ UserSocail.init(
       allowNull: false,
       references: {
         model: User,
-        key: "userId",
+        key: "id",
       },
     },
-    interestName: {
+    socailLinks: {
       type: DataTypes.STRING,
       allowNull: false,
+      get() {
+        return JSON.parse(this.getDataValue("socailLinks"));
+      },
+      set(value) {
+        this.setDataValue("socailLinks", JSON.stringify(value));
+      },
     },
   },
   {
@@ -33,6 +39,9 @@ UserSocail.init(
     timestamps: false,
   }
 );
+User.addScope("defaultScope", {
+  attributes: { exclude: ["password"] },
+});
 
 UserSocail.belongsTo(User, { as: "User", foreignKey: "userId" });
 

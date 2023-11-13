@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import httpStatus from "http-status";
-import ApiError from "../../../errors/ApiError";
-import catchAsync from "../../../shared/catchAsync";
-import sendResponse from "../../../shared/sendResponse";
+import ApiError from "../../../../errors/ApiError";
+import catchAsync from "../../../../shared/catchAsync";
+import sendResponse from "../../../../shared/sendResponse";
 import { likeService } from "./like.services";
 
 const createOrRemoveLike = catchAsync(async (req: Request, res: Response) => {
