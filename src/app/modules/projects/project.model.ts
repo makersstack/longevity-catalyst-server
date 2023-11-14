@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../config/sequelize-config";
+import { User } from "../user/user.model";
 
 class Project extends Model {
-  [x: string]: any;
   static async findProjectById(id: number) {
     return Project.findByPk(id);
   }
@@ -22,8 +22,13 @@ Project.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    postAuthInfo: {
-      type: DataTypes.TEXT,
+    authorId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: User,
+        key: "id",
+      },
     },
     projectTitle: {
       type: DataTypes.STRING,
@@ -31,6 +36,13 @@ Project.init(
     },
     projectDescription: {
       type: DataTypes.TEXT,
+      allowNull: false,
+      get() {
+        return JSON.parse(this.getDataValue("projectDescription"));
+      },
+      set(value) {
+        this.setDataValue("projectDescription", JSON.stringify(value));
+      },
     },
     scheduleMeetingLink: {
       type: DataTypes.STRING,
@@ -40,21 +52,56 @@ Project.init(
     },
     requiredSkills: {
       type: DataTypes.TEXT,
+      allowNull: false,
+      get() {
+        return JSON.parse(this.getDataValue("requiredSkills"));
+      },
+      set(value) {
+        this.setDataValue("requiredSkills", JSON.stringify(value));
+      },
     },
     linksToRelevantData: {
       type: DataTypes.TEXT,
+      allowNull: false,
+      get() {
+        return JSON.parse(this.getDataValue("linksToRelevantData"));
+      },
+      set(value) {
+        this.setDataValue("linksToRelevantData", JSON.stringify(value));
+      },
     },
     linksToRelevantLiterature: {
       type: DataTypes.TEXT,
+      allowNull: false,
+      get() {
+        return JSON.parse(this.getDataValue("linksToRelevantLiterature"));
+      },
+      set(value) {
+        this.setDataValue("linksToRelevantLiterature", JSON.stringify(value));
+      },
     },
     additionalInformation: {
       type: DataTypes.TEXT,
+      allowNull: false,
+      get() {
+        return JSON.parse(this.getDataValue("additionalInformation"));
+      },
+      set(value) {
+        this.setDataValue("additionalInformation", JSON.stringify(value));
+      },
     },
     affiliation: {
       type: DataTypes.STRING,
     },
     keywords: {
       type: DataTypes.TEXT,
+      allowNull: false,
+      get() {
+        return JSON.parse(this.getDataValue("keywords"));
+      },
+      set(value) {
+        this.setDataValue("keywords", JSON.stringify(value));
+      },
     },
     onsiteRequirement: {
       type: DataTypes.STRING,
@@ -86,12 +133,19 @@ Project.init(
     downVoteCount: {
       type: DataTypes.INTEGER,
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+    },
   },
   {
     sequelize,
     modelName: "Project",
     tableName: "projects",
-    timestamps: false,
+    timestamps: true,
   }
 );
 
@@ -101,5 +155,7 @@ sequelize
   .catch((err) => {
     console.error("Error creating Project table:", err);
   });
+
+Project.belongsTo(User, { foreignKey: "authorId" });
 
 export { Project };

@@ -1,22 +1,13 @@
 import bcrypt from "bcrypt";
 import httpStatus from "http-status";
-import { Op, Optional } from "sequelize";
-import { NullishPropertiesOf } from "sequelize/types/utils";
+import { Op } from "sequelize";
 import config from "../../../config";
 import ApiError from "../../../errors/ApiError";
+import { logger } from "../../../shared/logger";
 import { IUser } from "./user.interface";
 import { User } from "./user.model";
 
-const createUser = async (
-  userData: Optional<IUser, NullishPropertiesOf<IUser>> | undefined
-) => {
-  if (!userData?.password) {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "Password is required to create a user"
-    );
-  }
-
+const createUser = async (userData: IUser): Promise<IUser | null> => {
   // Check if the username or email is already in use
   const existingUser = await User.findOne({
     where: {
@@ -39,34 +30,66 @@ const createUser = async (
 
   userData.password = hashedPassword;
 
-  const user = await User.create(userData);
+  if (userData.profileImage) {
+    logger.info("Image Id response");
+  }
 
-  return user;
+  const user = await User.create(userData, {
+    returning: true,
+    plain: true,
+    attributes: { exclude: ["password"] },
+  });
+  const userPlainData = user.toJSON() as IUser;
+  return userPlainData;
 };
 
 // For all users
-const getUsers = async () => {
+const getAllUsers = async (): Promise<IUser[] | null> => {
   const users = await User.findAll({
     attributes: { exclude: ["password"] },
   });
-  return users;
+
+  const userArray: IUser[] = users.map((user) => {
+    const { id, full_name, username, role, ...rest } = user.toJSON();
+    return { id, full_name, username, role, ...rest } as IUser;
+  });
+
+  return userArray;
+};
+
+// For Update User
+const updateUser = async (
+  username: string,
+  updateData: Partial<IUser>
+): Promise<IUser | null> => {
+  const user = await User.findOne({ where: { username } });
+  if (!user) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "User Not Found");
+  }
+  user.set(updateData);
+
+  await user.save();
+
+  const updatedUserPlainData = user.toJSON() as IUser;
+  return updatedUserPlainData;
 };
 
 // For Single User
-const getUserByUserName = async (username: string) => {
+const getUserByUserName = async (userName: string): Promise<IUser | null> => {
   const user = await User.findOne({
-    where: { username: username },
+    where: { username: userName },
     attributes: { exclude: ["password"] },
   });
   if (!user) {
     throw new ApiError(httpStatus.BAD_REQUEST, "User Not Found");
   }
-
-  return user;
+  const userPlainData = user.toJSON() as IUser;
+  return userPlainData;
 };
 
 export const userService = {
   createUser,
-  getUsers,
+  updateUser,
+  getAllUsers,
   getUserByUserName,
 };

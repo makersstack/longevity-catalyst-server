@@ -1,5 +1,10 @@
-export interface UserSkill {
+export interface UserSkillInterface {
   id: number;
   userId: number;
-  skillName: string;
+  skillName: string[];
 }
+
+export type IUserSkillInterface = {
+  userId: number;
+  skillName: string[];
+};

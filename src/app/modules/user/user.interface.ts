@@ -7,9 +7,9 @@ export interface IUser {
   password: string;
   company?: string | null;
   bio?: string | null;
-  profile_photo?: string | null;
-  created_at: Date;
-  updated_at: Date;
+  profileImage?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type IResponse = {
@@ -20,8 +20,7 @@ export type IResponse = {
   email: string;
   company?: string | null;
   bio?: string | null;
-  profile_photo?: string | null;
-  // userSkills: string[];
-  created_at: Date;
-  updated_at: Date;
+  profileImage?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 };

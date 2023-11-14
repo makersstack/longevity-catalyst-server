@@ -1,14 +1,21 @@
 import httpStatus from "http-status";
-import ApiError from "../../../errors/ApiError";
-import { Project } from "../projects/project.model";
+import ApiError from "../../../../errors/ApiError";
+import { jwtHelpers } from "../../../../helpers/jwtHelpers";
+import { Project } from "../project.model";
 import { VoteModel } from "./vote.modle";
 
-const createVote = async (voteData: {
-  userId: number;
+const createOrRemoveVote = async (voteData: {
+  token: string;
   projectId: number;
   voteType: "up" | "down";
 }) => {
-  const { userId, projectId, voteType } = voteData;
+  const { token, projectId, voteType } = voteData;
+
+  const userInfo = jwtHelpers.getUserInfoByToken(token);
+  if (!userInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Error creating like");
+  }
+  const { userId } = userInfo;
 
   // Check for user has already voted this item
   const existingVote = await VoteModel.findOne({
@@ -83,7 +90,39 @@ const getVoteByProject = async (projectId: number) => {
   }
 };
 
+const getVotebyUser = async (token: string) => {
+  const userInfo = jwtHelpers.getUserInfoByToken(token);
+  if (!userInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Error creating like");
+  }
+  const { userId } = userInfo;
+
+  const userVotes = await VoteModel.findAll({
+    where: { userId },
+  });
+
+  let upVoteCount = 0;
+  let downVoteCount = 0;
+
+  userVotes.forEach((vote) => {
+    if (vote.voteType === "up") {
+      upVoteCount++;
+    } else if (vote.voteType === "down") {
+      downVoteCount--;
+    }
+  });
+
+  const totalVoteCount = upVoteCount - downVoteCount;
+
+  return {
+    upVoteCount,
+    downVoteCount,
+    totalVoteCount,
+  };
+};
+
 export const voteService = {
-  createVote,
+  createOrRemoveVote,
   getVoteByProject,
+  getVotebyUser,
 };

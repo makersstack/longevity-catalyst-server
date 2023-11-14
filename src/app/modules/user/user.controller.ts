@@ -1,41 +1,111 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
+import cloudinary from "../../../config/cloudinary";
 import ApiError from "../../../errors/ApiError";
+import { utilities } from "../../../helpers/utilities";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
-import { IUser } from "./user.interface";
+import { IResponse, IUser } from "./user.interface";
 import { userService } from "./user.services";
 
 // Create a new user
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userData: IUser = req.body;
-      console.log(userData);
-      const user = await userService.createUser(userData);
+    const userData: IUser = req.body;
 
-      const modifyData = user.dataValues;
+    if (req.file) {
+      // @ts-ignore
+      cloudinary.uploader.upload(req.file?.path, async function (err, result) {
+        if (err || !result) {
+          return res.status(500).json({
+            success: false,
+            message: "Error uploading image",
+          });
+        }
+        userData.profileImage = result.secure_url;
 
-      const userDetails = (({ password, ...rest }) => rest)(modifyData);
+        const userAllData = await userService.createUser(userData);
 
-      sendResponse(res, {
+        if (!userAllData) {
+          throw new ApiError(
+            httpStatus.BAD_REQUEST,
+            "Error creating user in controller"
+          );
+        }
+        sendResponse<IResponse>(res, {
+          statusCode: httpStatus.OK,
+          success: true,
+          message: "User created successfully!",
+          data: userAllData,
+        });
+      });
+    } else {
+      const result = await userService.createUser(userData);
+
+      if (!result) {
+        throw new ApiError(
+          httpStatus.BAD_REQUEST,
+          "This error for controller get null"
+        );
+      }
+      const { password, ...userAllInfo } = result;
+
+      sendResponse<IResponse>(res, {
         statusCode: httpStatus.OK,
         success: true,
         message: "User created successfully!",
-        data: userDetails,
+        data: userAllInfo,
       });
-    } catch (error) {
-      throw new ApiError(httpStatus.BAD_GATEWAY, `${error}:`);
     }
   }
 );
+const updateUser = catchAsync(async (req: Request, res: Response) => {
+  const userName = req.params.username;
+  const updateData = req.body;
+  const token = req.headers.authorization;
+  if (!token) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "Unauthorized access. Please log in."
+    );
+  }
+  const isAuthorized = utilities.verifiedTokenAndDb(token);
+  if (!isAuthorized) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+  }
 
+  const userDetails = await userService.updateUser(userName, updateData);
+
+  if (!userDetails) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "User data not updated");
+  }
+  const { password, ...userData } = userDetails;
+
+  sendResponse<IResponse>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Users retrieved successfully",
+    data: userData,
+  });
+});
 // Get all users
-const getUsers = catchAsync(async (req: Request, res: Response) => {
-  const users = await userService.getUsers();
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "Unauthorized access. Please log in."
+    );
+  }
+  const isAuthorized = utilities.verifiedTokenAndDb(token);
+  if (!isAuthorized) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+  }
+  const users = await userService.getAllUsers();
 
-  sendResponse(res, {
+  sendResponse<IResponse[]>(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Users retrieved successfully",
@@ -45,10 +115,21 @@ const getUsers = catchAsync(async (req: Request, res: Response) => {
 
 // For Single users
 const getUserByUserName = catchAsync(async (req: Request, res: Response) => {
-  const username = req.params.username;
-  const userDetails = await userService.getUserByUserName(username);
+  const userName = req.params.username;
+  const token = req.headers.authorization;
+  if (!token) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "Unauthorized access. Please log in."
+    );
+  }
+  const isAuthorized = utilities.verifiedTokenAndDb(token);
+  if (!isAuthorized) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+  }
+  const userDetails = await userService.getUserByUserName(userName);
 
-  sendResponse(res, {
+  sendResponse<IResponse>(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Users retrieved successfully",
@@ -58,6 +139,7 @@ const getUserByUserName = catchAsync(async (req: Request, res: Response) => {
 
 export const UserController = {
   createUser,
-  getUsers,
+  updateUser,
+  getAllUsers,
   getUserByUserName,
 };
