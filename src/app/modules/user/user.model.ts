@@ -54,8 +54,9 @@ User.init(
     bio: {
       type: DataTypes.TEXT,
     },
-    profile_photo: {
+    profileImage: {
       type: DataTypes.STRING,
+      allowNull: true,
     },
     createdAt: {
       type: DataTypes.DATE,

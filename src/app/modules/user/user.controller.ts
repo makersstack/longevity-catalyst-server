@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
+import cloudinary from "../../../config/cloudinary";
 import ApiError from "../../../errors/ApiError";
+import { utilities } from "../../../helpers/utilities";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { IResponse, IUser } from "./user.interface";
@@ -12,28 +15,66 @@ const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const userData: IUser = req.body;
 
-    const result = await userService.createUser(userData);
+    if (req.file) {
+      // @ts-ignore
+      cloudinary.uploader.upload(req.file?.path, async function (err, result) {
+        if (err || !result) {
+          return res.status(500).json({
+            success: false,
+            message: "Error uploading image",
+          });
+        }
+        userData.profileImage = result.secure_url;
 
-    if (!result) {
-      throw new ApiError(
-        httpStatus.BAD_REQUEST,
-        "This error for controller get null"
-      );
+        const userAllData = await userService.createUser(userData);
+
+        if (!userAllData) {
+          throw new ApiError(
+            httpStatus.BAD_REQUEST,
+            "Error creating user in controller"
+          );
+        }
+        sendResponse<IResponse>(res, {
+          statusCode: httpStatus.OK,
+          success: true,
+          message: "User created successfully!",
+          data: userAllData,
+        });
+      });
+    } else {
+      const result = await userService.createUser(userData);
+
+      if (!result) {
+        throw new ApiError(
+          httpStatus.BAD_REQUEST,
+          "This error for controller get null"
+        );
+      }
+
+      sendResponse<IResponse>(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "User created successfully!",
+        data: result,
+      });
     }
-
-    const { password, ...otersData } = result;
-
-    sendResponse<IResponse>(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "User created successfully!",
-      data: otersData,
-    });
   }
 );
 const updateUser = catchAsync(async (req: Request, res: Response) => {
   const userName = req.params.username;
   const updateData = req.body;
+  const token = req.headers.authorization;
+  if (!token) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "Unauthorized access. Please log in."
+    );
+  }
+  const isAuthorized = utilities.verifiedTokenAndDb(token);
+  if (!isAuthorized) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+  }
+
   const userDetails = await userService.updateUser(userName, updateData);
 
   if (!userDetails) {
@@ -50,6 +91,17 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 });
 // Get all users
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "Unauthorized access. Please log in."
+    );
+  }
+  const isAuthorized = utilities.verifiedTokenAndDb(token);
+  if (!isAuthorized) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+  }
   const users = await userService.getAllUsers();
 
   sendResponse<IResponse[]>(res, {
@@ -63,6 +115,17 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 // For Single users
 const getUserByUserName = catchAsync(async (req: Request, res: Response) => {
   const userName = req.params.username;
+  const token = req.headers.authorization;
+  if (!token) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "Unauthorized access. Please log in."
+    );
+  }
+  const isAuthorized = utilities.verifiedTokenAndDb(token);
+  if (!isAuthorized) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+  }
   const userDetails = await userService.getUserByUserName(userName);
 
   sendResponse<IResponse>(res, {

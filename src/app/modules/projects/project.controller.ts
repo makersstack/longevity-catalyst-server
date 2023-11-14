@@ -83,6 +83,7 @@ const deleteProject = catchAsync(async (req: Request, res: Response) => {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
   }
   const deletedProject = await ProjectService.deleteProject(projectId);
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

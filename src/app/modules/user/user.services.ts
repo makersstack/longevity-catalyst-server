@@ -7,13 +7,6 @@ import { IUser } from "./user.interface";
 import { User } from "./user.model";
 
 const createUser = async (userData: IUser): Promise<IUser | null> => {
-  if (!userData?.password) {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "Password is required to create a user"
-    );
-  }
-
   // Check if the username or email is already in use
   const existingUser = await User.findOne({
     where: {
@@ -35,6 +28,10 @@ const createUser = async (userData: IUser): Promise<IUser | null> => {
   );
 
   userData.password = hashedPassword;
+
+  if (userData.profileImage) {
+    console.log("Image Id response");
+  }
 
   const user = await User.create(userData);
   const userPlainData = user.toJSON() as IUser;
