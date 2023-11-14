@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 import { Op } from "sequelize";
 import config from "../../../config";
 import ApiError from "../../../errors/ApiError";
+import { logger } from "../../../shared/logger";
 import { IUser } from "./user.interface";
 import { User } from "./user.model";
 
@@ -30,10 +31,14 @@ const createUser = async (userData: IUser): Promise<IUser | null> => {
   userData.password = hashedPassword;
 
   if (userData.profileImage) {
-    console.log("Image Id response");
+    logger.info("Image Id response");
   }
 
-  const user = await User.create(userData);
+  const user = await User.create(userData, {
+    returning: true,
+    plain: true,
+    attributes: { exclude: ["password"] },
+  });
   const userPlainData = user.toJSON() as IUser;
   return userPlainData;
 };

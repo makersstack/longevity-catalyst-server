@@ -50,12 +50,13 @@ const createUser = catchAsync(
           "This error for controller get null"
         );
       }
+      const { password, ...userAllInfo } = result;
 
       sendResponse<IResponse>(res, {
         statusCode: httpStatus.OK,
         success: true,
         message: "User created successfully!",
-        data: result,
+        data: userAllInfo,
       });
     }
   }
