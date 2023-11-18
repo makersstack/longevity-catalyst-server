@@ -16,13 +16,13 @@ const createProject = catchAsync(async (req: Request, res: Response) => {
   const token = req.headers.authorization;
   if (!token) {
     throw new ApiError(
-      httpStatus.UNAUTHORIZED,
+      httpStatus.FORBIDDEN,
       "Unauthorized access. Please log in."
     );
   }
   const isAuthorized = utilities.verifiedTokenAndDb(token);
   if (!isAuthorized) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+    throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized!");
   }
   console.log(ReqprojectData);
   const project = await ProjectService.createProject(token, ReqprojectData);

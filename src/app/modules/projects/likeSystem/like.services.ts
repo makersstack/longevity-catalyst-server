@@ -15,6 +15,7 @@ const createOrRemoveLike = async (token: string, postId: any) => {
   if (!userId || !postId || !role) {
     throw new ApiError(httpStatus.NOT_FOUND, "Error creating like");
   }
+
   // Checking for like
   const existingLike = await LikeModel.findOne({ where: { userId, postId } });
 

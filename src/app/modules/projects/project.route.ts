@@ -1,6 +1,7 @@
 import express from "express";
 import { ENUM_USER_ROLE } from "../../../enums/user";
 import auth from "../../middlewares/auth";
+import { likeController } from "./likeSystem/like.controller";
 import { projectController } from "./project.controller";
 
 const router = express.Router();
@@ -29,5 +30,8 @@ router.patch(
   ),
   projectController.updateProject
 );
+
+// LikeSyste
+router.post("/:id/like", likeController.createOrRemoveLike);
 
 export const ProjectRouter = router;
