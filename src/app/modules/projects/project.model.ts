@@ -20,7 +20,7 @@ Project.init(
     },
     projectTime: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     authorId: {
       type: DataTypes.INTEGER,
@@ -32,11 +32,11 @@ Project.init(
     },
     projectTitle: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     projectDescription: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
       get() {
         return JSON.parse(this.getDataValue("projectDescription"));
       },
@@ -52,7 +52,7 @@ Project.init(
     },
     requiredSkills: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
       get() {
         return JSON.parse(this.getDataValue("requiredSkills"));
       },
@@ -60,9 +60,21 @@ Project.init(
         this.setDataValue("requiredSkills", JSON.stringify(value));
       },
     },
+    required_skill_list: {
+      type: DataTypes.TEXT,
+    },
+    relevant_link: {
+      type: DataTypes.TEXT,
+    },
+    relevant_literature_link: {
+      type: DataTypes.TEXT,
+    },
+    other_included: {
+      type: DataTypes.TEXT,
+    },
     linksToRelevantData: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
       get() {
         return JSON.parse(this.getDataValue("linksToRelevantData"));
       },
@@ -72,7 +84,7 @@ Project.init(
     },
     linksToRelevantLiterature: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
       get() {
         return JSON.parse(this.getDataValue("linksToRelevantLiterature"));
       },
@@ -80,9 +92,33 @@ Project.init(
         this.setDataValue("linksToRelevantLiterature", JSON.stringify(value));
       },
     },
+    address: {
+      type: DataTypes.STRING,
+    },
+    addressLine: {
+      type: DataTypes.STRING,
+    },
+    city_town: {
+      type: DataTypes.STRING,
+    },
+    state_region_province: {
+      type: DataTypes.STRING,
+    },
+    zip_code: {
+      type: DataTypes.STRING,
+    },
+    country: {
+      type: DataTypes.STRING,
+    },
+    answer: {
+      type: DataTypes.TEXT,
+    },
+    final_deliverable_details: {
+      type: DataTypes.TEXT,
+    },
     additionalInformation: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
       get() {
         return JSON.parse(this.getDataValue("additionalInformation"));
       },
@@ -95,7 +131,7 @@ Project.init(
     },
     keywords: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
       get() {
         return JSON.parse(this.getDataValue("keywords"));
       },
@@ -115,7 +151,28 @@ Project.init(
     primaryCategory: {
       type: DataTypes.STRING,
     },
-    deadline: {
+    p_deadline: {
+      type: DataTypes.STRING,
+    },
+    // hardDeadline: {
+    //   type: DataTypes.STRING,
+    // },
+    onsite_work: {
+      type: DataTypes.STRING,
+    },
+    projecType: {
+      type: DataTypes.STRING,
+    },
+    projectNature: {
+      type: DataTypes.STRING,
+    },
+    readyToStart: {
+      type: DataTypes.STRING,
+    },
+    projectExperience: {
+      type: DataTypes.STRING,
+    },
+    expectedTimeProject: {
       type: DataTypes.STRING,
     },
     expectedDuration: {
