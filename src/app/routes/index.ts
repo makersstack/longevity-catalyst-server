@@ -1,6 +1,7 @@
 import express from "express";
 import { AdminRoute } from "../modules/admin/admin.router";
 import { AuthRoutes } from "../modules/auth/auth.route";
+import { ProjectRouter } from "../modules/projects/project.route";
 import { imageRoute } from "../modules/user/imageController";
 import { UserRoutes } from "../modules/user/user.router";
 
@@ -26,10 +27,10 @@ const moduleRoutes = [
   //   path: "/socail",
   //   route: userSocailRoute,
   // },
-  // {
-  //   path: "/projects",
-  //   route: ProjectRouter,
-  // },
+  {
+    path: "/projects",
+    route: ProjectRouter,
+  },
   // {
   //   path: "/comment",
   //   route: commentRoute,
