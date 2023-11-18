@@ -12,7 +12,7 @@ import { ProjectData } from "./project.interface";
 import { ProjectService } from "./project.services";
 
 const createProject = catchAsync(async (req: Request, res: Response) => {
-  const projectData = req.body;
+  const ReqprojectData = req.body;
   const token = req.headers.authorization;
   if (!token) {
     throw new ApiError(
@@ -24,8 +24,8 @@ const createProject = catchAsync(async (req: Request, res: Response) => {
   if (!isAuthorized) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
   }
-
-  const project = await ProjectService.createProject(token, projectData);
+  console.log(ReqprojectData);
+  const project = await ProjectService.createProject(token, ReqprojectData);
 
   sendResponse<ProjectData>(res, {
     statusCode: httpStatus.OK,

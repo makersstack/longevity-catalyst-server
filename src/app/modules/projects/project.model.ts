@@ -18,10 +18,6 @@ Project.init(
       autoIncrement: true,
       allowNull: false,
     },
-    projectTime: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     authorId: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -30,108 +26,121 @@ Project.init(
         key: "id",
       },
     },
-    projectTitle: {
+    project_name: {
       type: DataTypes.STRING,
-      allowNull: false,
-    },
-    projectDescription: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-      get() {
-        return JSON.parse(this.getDataValue("projectDescription"));
-      },
-      set(value) {
-        this.setDataValue("projectDescription", JSON.stringify(value));
-      },
-    },
-    scheduleMeetingLink: {
-      type: DataTypes.STRING,
-    },
-    experienceRequired: {
-      type: DataTypes.STRING,
-    },
-    requiredSkills: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-      get() {
-        return JSON.parse(this.getDataValue("requiredSkills"));
-      },
-      set(value) {
-        this.setDataValue("requiredSkills", JSON.stringify(value));
-      },
-    },
-    linksToRelevantData: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-      get() {
-        return JSON.parse(this.getDataValue("linksToRelevantData"));
-      },
-      set(value) {
-        this.setDataValue("linksToRelevantData", JSON.stringify(value));
-      },
-    },
-    linksToRelevantLiterature: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-      get() {
-        return JSON.parse(this.getDataValue("linksToRelevantLiterature"));
-      },
-      set(value) {
-        this.setDataValue("linksToRelevantLiterature", JSON.stringify(value));
-      },
-    },
-    additionalInformation: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-      get() {
-        return JSON.parse(this.getDataValue("additionalInformation"));
-      },
-      set(value) {
-        this.setDataValue("additionalInformation", JSON.stringify(value));
-      },
     },
     affiliation: {
       type: DataTypes.STRING,
     },
-    keywords: {
+    project_desc: {
       type: DataTypes.TEXT,
-      allowNull: false,
-      get() {
-        return JSON.parse(this.getDataValue("keywords"));
-      },
-      set(value) {
-        this.setDataValue("keywords", JSON.stringify(value));
-      },
     },
-    onsiteRequirement: {
+    project_keywords: {
+      type: DataTypes.JSON,
+    },
+    onsite_work: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    address: {
       type: DataTypes.STRING,
     },
-    projectType: {
+    address_line: {
       type: DataTypes.STRING,
     },
-    membersNeeded: {
+    city_town: {
       type: DataTypes.STRING,
     },
-    primaryCategory: {
+    state_region_province: {
       type: DataTypes.STRING,
     },
-    deadline: {
+    zip_code: {
       type: DataTypes.STRING,
     },
-    expectedDuration: {
+    country: {
       type: DataTypes.STRING,
     },
-    timeToStart: {
+    projecType: {
+      type: DataTypes.ENUM("Individual", "Team", "Other"),
+      defaultValue: "Other",
+    },
+    projectNature: {
+      type: DataTypes.ENUM(
+        "General Programming",
+        "Data Analysis",
+        "Wet Lab",
+        "Other"
+      ),
+      defaultValue: "Other",
+    },
+    projectExperience: {
+      type: DataTypes.ENUM(
+        "Novice",
+        "Intermediate",
+        "Proficient",
+        "Advanced",
+        "Expert"
+      ),
+      defaultValue: "Novice",
+    },
+    required_skill_list: {
+      type: DataTypes.TEXT,
+    },
+    p_deadline: {
+      type: DataTypes.DATE,
+    },
+    hardDeadline: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    expectedTimeProject: {
+      type: DataTypes.ENUM(
+        "Less than 1 week",
+        "Less than 1 month",
+        "Less than 3 months",
+        "Greater than 3 months",
+        "Other"
+      ),
+      defaultValue: "Other",
+    },
+    haveProjectBudget: {
+      type: DataTypes.ENUM(
+        "I have a budget",
+        "I will require a volunteer / sponsorship"
+      ),
+      defaultValue: "I have a budget",
+    },
+    answer: {
+      type: DataTypes.TEXT,
+    },
+    readyToStart: {
+      type: DataTypes.ENUM(
+        "Immediately",
+        "Within 1 week",
+        "Within 2 week",
+        "Other"
+      ),
+      defaultValue: "Other",
+    },
+    final_deliverable_details: {
+      type: DataTypes.TEXT,
+    },
+    relevant_link: {
       type: DataTypes.STRING,
     },
-    projectSubmitted: {
-      type: DataTypes.STRING,
+    relevant_literature_link: {
+      type: DataTypes.TEXT,
+    },
+    other_included: {
+      type: DataTypes.TEXT,
     },
     upVoteCount: {
       type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
     downVoteCount: {
       type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
     createdAt: {
       type: DataTypes.DATE,
