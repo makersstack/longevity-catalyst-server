@@ -33,7 +33,7 @@ Project.init(
       type: DataTypes.STRING,
     },
     project_desc: {
-      type: DataTypes.TEXT,
+      type: DataTypes.TEXT("long"),
     },
     project_keywords: {
       type: DataTypes.JSON,
@@ -84,10 +84,11 @@ Project.init(
       defaultValue: "Novice",
     },
     required_skill_list: {
-      type: DataTypes.TEXT,
+      type: DataTypes.JSON,
     },
     p_deadline: {
       type: DataTypes.DATE,
+      allowNull: true,
     },
     hardDeadline: {
       type: DataTypes.BOOLEAN,
@@ -110,8 +111,8 @@ Project.init(
       ),
       defaultValue: "I have a budget",
     },
-    answer: {
-      type: DataTypes.TEXT,
+    expected_cost: {
+      type: DataTypes.TEXT("long"),
     },
     readyToStart: {
       type: DataTypes.ENUM(
@@ -123,16 +124,16 @@ Project.init(
       defaultValue: "Other",
     },
     final_deliverable_details: {
-      type: DataTypes.TEXT,
+      type: DataTypes.JSON,
     },
     relevant_link: {
       type: DataTypes.STRING,
     },
     relevant_literature_link: {
-      type: DataTypes.TEXT,
+      type: DataTypes.JSON,
     },
     other_included: {
-      type: DataTypes.TEXT,
+      type: DataTypes.TEXT("long"),
     },
     upVoteCount: {
       type: DataTypes.INTEGER,

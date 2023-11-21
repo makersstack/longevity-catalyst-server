@@ -97,14 +97,14 @@ const getAllProjects = catchAsync(
     const filters = pick(req.query, projectFilterableFields);
     const paginationOptions = pick(req.query, paginationFileds);
     const token = req.headers.authorization;
-    if (!token) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
-    }
+    // if (!token) {
+    //   throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+    // }
 
-    const isAuthorized = utilities.verifiedTokenAndDb(token);
-    if (!isAuthorized) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
-    }
+    // const isAuthorized = utilities.verifiedTokenAndDb(token);
+    // if (!isAuthorized) {
+    //   throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+    // }
 
     const result = await ProjectService.getAllProjects(
       filters,
