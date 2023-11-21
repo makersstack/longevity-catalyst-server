@@ -38,7 +38,7 @@ const globalErrorHandler: ErrorRequestHandler = (
       : [];
   } else if (error instanceof Error) {
     if (error.name === "TokenExpiredError") {
-      statusCode = 403;
+      statusCode = 401;
       message = "Forbidden - Token Expired";
       errorMessages = [
         {

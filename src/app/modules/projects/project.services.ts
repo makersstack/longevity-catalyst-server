@@ -21,7 +21,7 @@ const createProject = async (
 ): Promise<ProjectData | null> => {
   const isAuthorized = utilities.verifiedTokenAndDb(token);
   if (!isAuthorized) {
-    throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized!");
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
   }
 
   const userInfo = (await utilities.tokenToUserInfo(token)) as any;
