@@ -61,7 +61,7 @@ export interface ProjectData {
   hardDeadline?: boolean;
   expectedTimeProject?: ExpectedTimeProject;
   haveProjectBudget?: HaveProjectBudget;
-  answer?: string;
+  expected_cost?: string;
   readyToStart?: ReadyToStart;
   final_deliverable_details?: string;
   relevant_link?: string;
@@ -99,7 +99,7 @@ export type IApiResponseProjectData = {
   hardDeadline?: boolean;
   expectedTimeProject?: ExpectedTimeProject;
   haveProjectBudget?: HaveProjectBudget;
-  answer?: string;
+  expected_cost?: string;
   readyToStart?: ReadyToStart;
   final_deliverable_details?: string;
   relevant_link?: string;
