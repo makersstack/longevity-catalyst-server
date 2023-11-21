@@ -18,10 +18,6 @@ Project.init(
       autoIncrement: true,
       allowNull: false,
     },
-    projectTime: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     authorId: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -30,72 +26,26 @@ Project.init(
         key: "id",
       },
     },
-    projectTitle: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    projectDescription: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-      get() {
-        return JSON.parse(this.getDataValue("projectDescription"));
-      },
-      set(value) {
-        this.setDataValue("projectDescription", JSON.stringify(value));
-      },
-    },
-    scheduleMeetingLink: {
+    project_name: {
       type: DataTypes.STRING,
     },
-    experienceRequired: {
+    affiliation: {
       type: DataTypes.STRING,
     },
-    requiredSkills: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-      get() {
-        return JSON.parse(this.getDataValue("requiredSkills"));
-      },
-      set(value) {
-        this.setDataValue("requiredSkills", JSON.stringify(value));
-      },
+    project_desc: {
+      type: DataTypes.TEXT("long"),
     },
-    required_skill_list: {
-      type: DataTypes.TEXT,
+    project_keywords: {
+      type: DataTypes.JSON,
     },
-    relevant_link: {
-      type: DataTypes.TEXT,
-    },
-    relevant_literature_link: {
-      type: DataTypes.TEXT,
-    },
-    other_included: {
-      type: DataTypes.TEXT,
-    },
-    linksToRelevantData: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-      get() {
-        return JSON.parse(this.getDataValue("linksToRelevantData"));
-      },
-      set(value) {
-        this.setDataValue("linksToRelevantData", JSON.stringify(value));
-      },
-    },
-    linksToRelevantLiterature: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-      get() {
-        return JSON.parse(this.getDataValue("linksToRelevantLiterature"));
-      },
-      set(value) {
-        this.setDataValue("linksToRelevantLiterature", JSON.stringify(value));
-      },
+    onsite_work: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
     address: {
       type: DataTypes.STRING,
     },
-    addressLine: {
+    address_line: {
       type: DataTypes.STRING,
     },
     city_town: {
@@ -110,85 +60,88 @@ Project.init(
     country: {
       type: DataTypes.STRING,
     },
-    answer: {
-      type: DataTypes.TEXT,
-    },
-    final_deliverable_details: {
-      type: DataTypes.TEXT,
-    },
-    additionalInformation: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-      get() {
-        return JSON.parse(this.getDataValue("additionalInformation"));
-      },
-      set(value) {
-        this.setDataValue("additionalInformation", JSON.stringify(value));
-      },
-    },
-    affiliation: {
-      type: DataTypes.STRING,
-    },
-    keywords: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-      get() {
-        return JSON.parse(this.getDataValue("keywords"));
-      },
-      set(value) {
-        this.setDataValue("keywords", JSON.stringify(value));
-      },
-    },
-    onsiteRequirement: {
-      type: DataTypes.STRING,
-    },
-    projectType: {
-      type: DataTypes.STRING,
-    },
-    membersNeeded: {
-      type: DataTypes.STRING,
-    },
-    primaryCategory: {
-      type: DataTypes.STRING,
-    },
-    p_deadline: {
-      type: DataTypes.STRING,
-    },
-    // hardDeadline: {
-    //   type: DataTypes.STRING,
-    // },
-    onsite_work: {
-      type: DataTypes.STRING,
-    },
     projecType: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM("Individual", "Team", "Other"),
+      defaultValue: "Other",
     },
     projectNature: {
-      type: DataTypes.STRING,
-    },
-    readyToStart: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM(
+        "General Programming",
+        "Data Analysis",
+        "Wet Lab",
+        "Other"
+      ),
+      defaultValue: "Other",
     },
     projectExperience: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM(
+        "Novice",
+        "Intermediate",
+        "Proficient",
+        "Advanced",
+        "Expert"
+      ),
+      defaultValue: "Novice",
+    },
+    required_skill_list: {
+      type: DataTypes.JSON,
+    },
+    p_deadline: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    hardDeadline: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
     expectedTimeProject: {
+      type: DataTypes.ENUM(
+        "Less than 1 week",
+        "Less than 1 month",
+        "Less than 3 months",
+        "Greater than 3 months",
+        "Other"
+      ),
+      defaultValue: "Other",
+    },
+    haveProjectBudget: {
+      type: DataTypes.ENUM(
+        "I have a budget",
+        "I will require a volunteer / sponsorship"
+      ),
+      defaultValue: "I have a budget",
+    },
+    expected_cost: {
+      type: DataTypes.TEXT("long"),
+    },
+    readyToStart: {
+      type: DataTypes.ENUM(
+        "Immediately",
+        "Within 1 week",
+        "Within 2 week",
+        "Other"
+      ),
+      defaultValue: "Other",
+    },
+    final_deliverable_details: {
+      type: DataTypes.JSON,
+    },
+    relevant_link: {
       type: DataTypes.STRING,
     },
-    expectedDuration: {
-      type: DataTypes.STRING,
+    relevant_literature_link: {
+      type: DataTypes.JSON,
     },
-    timeToStart: {
-      type: DataTypes.STRING,
-    },
-    projectSubmitted: {
-      type: DataTypes.STRING,
+    other_included: {
+      type: DataTypes.TEXT("long"),
     },
     upVoteCount: {
       type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
     downVoteCount: {
       type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
     createdAt: {
       type: DataTypes.DATE,
