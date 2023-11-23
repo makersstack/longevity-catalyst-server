@@ -2,6 +2,7 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../config/sequelize-config";
 import { User } from "../user/user.model";
+import { Categories } from "./categories/categories.model";
 
 class Project extends Model {
   static async findProjectById(id: number) {
@@ -36,7 +37,16 @@ Project.init(
       type: DataTypes.TEXT("long"),
     },
     project_keywords: {
-      type: DataTypes.JSON,
+      type: DataTypes.TEXT("long"),
+      allowNull: true,
+    },
+    primary_category: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Categories,
+        key: "id",
+      },
     },
     onsite_work: {
       type: DataTypes.BOOLEAN,
@@ -84,7 +94,8 @@ Project.init(
       defaultValue: "Novice",
     },
     required_skill_list: {
-      type: DataTypes.JSON,
+      type: DataTypes.TEXT("long"),
+      allowNull: true,
     },
     p_deadline: {
       type: DataTypes.DATE,
@@ -124,13 +135,15 @@ Project.init(
       defaultValue: "Other",
     },
     final_deliverable_details: {
-      type: DataTypes.JSON,
+      type: DataTypes.TEXT("long"),
+      allowNull: true,
     },
     relevant_link: {
       type: DataTypes.STRING,
     },
     relevant_literature_link: {
-      type: DataTypes.JSON,
+      type: DataTypes.TEXT("long"),
+      allowNull: true,
     },
     other_included: {
       type: DataTypes.TEXT("long"),
@@ -167,5 +180,6 @@ sequelize
   });
 
 Project.belongsTo(User, { foreignKey: "authorId" });
+Project.belongsTo(Categories, { foreignKey: "primary_category" });
 
 export { Project };

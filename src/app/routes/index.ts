@@ -1,6 +1,8 @@
 import express from "express";
 import { AdminRoute } from "../modules/admin/admin.router";
 import { AuthRoutes } from "../modules/auth/auth.route";
+import { categoryRoute } from "../modules/projects/categories/categories.route";
+import { projectCategoryRoute } from "../modules/projects/porojectCategory/projectCategory.route";
 import { ProjectRouter } from "../modules/projects/project.route";
 import { imageRoute } from "../modules/user/imageController";
 import { UserRoutes } from "../modules/user/user.router";
@@ -42,6 +44,14 @@ const moduleRoutes = [
   {
     path: "/upload",
     route: imageRoute,
+  },
+  {
+    path: "/categories",
+    route: categoryRoute,
+  },
+  {
+    path: "/category/project",
+    route: projectCategoryRoute,
   },
 ];
 
