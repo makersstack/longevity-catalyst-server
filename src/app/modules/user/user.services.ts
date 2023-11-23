@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import bcrypt from "bcrypt";
 import httpStatus from "http-status";
 import { Op } from "sequelize";
@@ -7,7 +8,7 @@ import { logger } from "../../../shared/logger";
 import { IUser } from "./user.interface";
 import { User } from "./user.model";
 
-const createUser = async (userData: IUser): Promise<IUser | null> => {
+const createUser = async (userData: any): Promise<any> => {
   // Check if the username or email is already in use
   const existingUser = await User.findOne({
     where: {
@@ -86,10 +87,28 @@ const getUserByUserName = async (userName: string): Promise<IUser | null> => {
   const userPlainData = user.toJSON() as IUser;
   return userPlainData;
 };
+const getUserInfoById = async (userId: number): Promise<IUser | null> => {
+  if (!userId) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+  console.log(userId, "this is for checking");
 
+  const findUser = await User.findByPk(userId, {
+    attributes: {
+      exclude: ["createdAt", "updatedAt", "password"],
+    },
+  });
+
+  if (!findUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+  const result = findUser.toJSON() as IUser;
+  return result;
+};
 export const userService = {
   createUser,
   updateUser,
   getAllUsers,
+  getUserInfoById,
   getUserByUserName,
 };
