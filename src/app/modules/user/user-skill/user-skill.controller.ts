@@ -1,4 +1,3 @@
-// user-skill.controller.ts
 import { Request, Response } from "express";
 import httpStatus from "http-status";
 import { Secret } from "jsonwebtoken";
@@ -7,23 +6,24 @@ import ApiError from "../../../../errors/ApiError";
 import { jwtHelpers } from "../../../../helpers/jwtHelpers";
 import catchAsync from "../../../../shared/catchAsync";
 import sendResponse from "../../../../shared/sendResponse";
-import { userSkillServices } from "./skills.service";
+import { userSkillServices } from "./user-skill.services";
 
 const createUserSkill = catchAsync(async (req: Request, res: Response) => {
-  const { skillName } = req.body;
+  const { skillId } = req.body;
   const token = req.headers.authorization;
 
   if (!token) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized");
   }
-  console.log("Here is token", token);
+
   const varifyedToken = jwtHelpers.verifyToken(
     token,
     config.jwt.secret as Secret
   );
 
   const { userId } = varifyedToken;
-  const userSkill = await userSkillServices.createUserSkill(userId, skillName);
+
+  const userSkill = await userSkillServices.createUserSkill(userId, skillId);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

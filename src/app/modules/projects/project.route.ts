@@ -8,7 +8,7 @@ const router = express.Router();
 
 // Define routes
 router.get("/", projectController.getAllProjects);
-router.get("/dashboard", projectController.getAllProjectsForDashboard);
+router.get("/user", projectController.getAllProjectsByUser);
 router.get("/:id", projectController.getSingleProject);
 
 router.post("/create", projectController.createProject);

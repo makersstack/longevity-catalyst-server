@@ -18,16 +18,16 @@ async function main() {
     errorlogger.error(`Failed to connect database`, error);
   }
 
-  // process.on("unhandledRejection", (error) => {
-  //   if (server) {
-  //     server.close(() => {
-  //       errorlogger.error(error);
-  //       process.exit(1);
-  //     });
-  //   } else {
-  //     process.exit(1);
-  //   }
-  // });
+  process.on("unhandledRejection", (error) => {
+    if (server) {
+      server.close(() => {
+        errorlogger.error(error);
+        process.exit(1);
+      });
+    } else {
+      process.exit(1);
+    }
+  });
 }
 
 main();

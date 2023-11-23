@@ -22,7 +22,7 @@ const createProject = async (
 ): Promise<ProjectData | null> => {
   const isAuthorized = utilities.verifiedTokenAndDb(token);
   if (!isAuthorized) {
-    throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized!");
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
   }
 
   const userInfo = (await utilities.tokenToUserInfo(token)) as any;
@@ -114,7 +114,14 @@ const getAllProjects = async (
     offset: skip,
     limit,
     order: [] as [string, string][],
-    include: User,
+    include: [
+      {
+        model: User,
+        attributes: {
+          exclude: ["password"],
+        },
+      },
+    ],
   };
 
   if (sortBy && sortOrder) {
@@ -161,39 +168,13 @@ const getSingleProject = async (token: string, projectId: number) => {
 
   return project;
 };
-const getAllProjectsForDashboard = async (
-  filters: IProjectFilters,
-  paginationOptions: IPaginationOptons
-) => {
-  // For Search
-  const { searchTerm, ...filtersData } = filters;
-  const andCondition = [];
-  if (searchTerm) {
-    andCondition.push({
-      [Op.or]: projectSearchableFields.map((field) => ({
-        [field]: {
-          [Op.like]: `%${searchTerm.toLowerCase()}%`,
-        },
-      })),
-    });
-  }
 
-  // For Filter
-  if (Object.keys(filtersData).length) {
-    andCondition.push({
-      [Op.and]: Object.entries(filtersData).map(([field, value]) => ({
-        [field]: value,
-      })),
-    });
-  }
+const getAllProjectsByUser = async (paginationOptions: IPaginationOptons) => {
   // For Pagination
   const { page, limit, skip, sortBy, sortOrder } =
     paginationHelpers.calculatePagination(paginationOptions);
 
   const options = {
-    where: {
-      [Op.and]: andCondition,
-    },
     offset: skip,
     limit,
     order: [] as [string, string][],
@@ -211,11 +192,16 @@ const getAllProjectsForDashboard = async (
   const formattedProjects = projects.rows.map((project: any) => {
     return {
       id: project.id,
-      projectTitle: project.projectTitle,
+      projectTitle: project.project_name,
+      projectDesc: project.project_desc,
+      createdAt: project.createdAt,
+      commentsCount: project.commentsCount,
+      sharesCount: project.sharesCount,
       user: {
         id: project.User.id,
-        userName: project.User.userName,
-        userImage: project.User.profile_photo,
+        userName: project.User.username,
+        userImage: project.User.profileImage,
+        fullName: project.User.full_name,
       },
     };
   });
@@ -234,7 +220,7 @@ const getAllProjectsForDashboard = async (
 export const ProjectService = {
   createProject,
   getAllProjects,
-  getAllProjectsForDashboard,
+  getAllProjectsByUser,
   getSingleProject,
   updateProject,
   deleteProject,

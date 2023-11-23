@@ -14,16 +14,16 @@ const app: Application = express();
 
 app.use(
   cors({
-    origin: "http://159.89.80.212",
+    origin: "http://localhost:3000",
     credentials: true,
   })
 );
 
 // TODO
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  next();
-});
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   next();
+// });
 
 app.use(express.json());
 
