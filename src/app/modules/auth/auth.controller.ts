@@ -19,9 +19,10 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 
   // set access token into cookie
   const cookieOptions = {
-    // secure: config.env === "production",
     httpOnly: true,
-    secure: false,
+    secure: config.env === "production",
+    // sameSite: 'None',
+    path: "/",
   };
 
   res.cookie("refreshToken", refreshToken, cookieOptions);
@@ -39,17 +40,17 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 
   const result = await AuthService.refreshToken(refreshToken);
 
-  const cookieOptions = {
-    secure: config.env === "production",
-    httpOnly: true,
-  };
+  // const cookieOptions = {
+  //   secure: config.env === "production",
+  //   httpOnly: true,
+  // };
 
-  res.cookie("refreshToken", refreshToken, cookieOptions);
+  // res.cookie("refreshToken", refreshToken, cookieOptions);
 
   sendResponse<IRefreshTokenResponse>(res, {
     statusCode: 200,
     success: true,
-    message: "Refresh token successfully extended!",
+    message: "Access token successfully extended!",
     data: result,
   });
 });
