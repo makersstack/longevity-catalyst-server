@@ -91,7 +91,6 @@ const getUserInfoById = async (userId: number): Promise<IUser | null> => {
   if (!userId) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found");
   }
-  console.log(userId, "this is for checking");
 
   const findUser = await User.findByPk(userId, {
     attributes: {

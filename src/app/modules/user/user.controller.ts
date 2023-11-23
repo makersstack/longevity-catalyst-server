@@ -122,6 +122,7 @@ const getUserByUserName = catchAsync(async (req: Request, res: Response) => {
   if (!isAuthorized) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
   }
+
   const userDetails = await userService.getUserByUserName(userName);
 
   sendResponse<IResponse>(res, {

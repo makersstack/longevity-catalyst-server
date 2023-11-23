@@ -122,22 +122,22 @@ const getAllProjects = catchAsync(
 );
 
 const getSingleProject = catchAsync(async (req: Request, res: Response) => {
-  const token = req.headers.authorization;
+  // const token = req.headers.authorization;
   const projectId = Number(req.params.id);
 
-  if (!token) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
-  }
+  // if (!token) {
+  //   throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+  // }
 
-  const isAuthorized = utilities.verifiedTokenAndDb(token);
-  if (!isAuthorized) {
-    throw new ApiError(
-      httpStatus.UNAUTHORIZED,
-      "Unauthorized access. Please log in."
-    );
-  }
+  // const isAuthorized = utilities.verifiedTokenAndDb(token);
+  // if (!isAuthorized) {
+  //   throw new ApiError(
+  //     httpStatus.UNAUTHORIZED,
+  //     "Unauthorized access. Please log in."
+  //   );
+  // }
 
-  const project = await ProjectService.getSingleProject(token, projectId);
+  const project = await ProjectService.getSingleProject(projectId);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
