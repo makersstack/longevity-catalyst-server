@@ -7,6 +7,7 @@ import { utilities } from "../../../helpers/utilities";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptons } from "../../../interfaces/pagination";
 import { User } from "../user/user.model";
+import { Categories } from "./categories/categories.model";
 import { projectSearchableFields } from "./project.constant";
 import {
   IApiResponseProjectData,
@@ -154,6 +155,9 @@ const getSingleProject = async (token: string, projectId: number) => {
         attributes: {
           exclude: ["password"],
         },
+      },
+      {
+        model: Categories,
       },
     ],
   });
