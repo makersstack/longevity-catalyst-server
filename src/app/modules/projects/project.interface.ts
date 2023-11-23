@@ -46,6 +46,7 @@ export interface ProjectData {
   affiliation?: string;
   project_desc?: string;
   project_keywords?: Record<string, unknown>;
+  primary_category?: number;
   onsite_work?: boolean;
   address?: string;
   address_line?: string;
@@ -84,6 +85,7 @@ export type IApiResponseProjectData = {
   affiliation?: string;
   project_desc?: string;
   project_keywords?: Record<string, unknown>;
+  primary_category?: number;
   onsite_work?: boolean;
   address?: string;
   address_line?: string;
