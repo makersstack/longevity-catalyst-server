@@ -6,9 +6,9 @@ import { commentRoute } from "../modules/projects/comments/comments.route";
 import { projectCategoryRoute } from "../modules/projects/porojectCategory/projectCategory.route";
 import { ProjectRouter } from "../modules/projects/project.route";
 import { replyRoute } from "../modules/projects/reply/reply.route";
+import { userSkillRoute } from "../modules/skills/skills.route";
 import { imageRoute } from "../modules/user/imageController";
 import { userSocailRoute } from "../modules/user/user-activities/socail.router";
-import { userSkillRoute } from "../modules/user/user-skills/skills.route";
 import { UserRoutes } from "../modules/user/user.router";
 
 const router = express.Router();
