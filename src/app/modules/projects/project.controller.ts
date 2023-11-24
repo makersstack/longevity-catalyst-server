@@ -155,13 +155,13 @@ const getSingleProject = catchAsync(async (req: Request, res: Response) => {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
   }
 
-  const isAuthorized = utilities.verifiedTokenAndDb(token);
-  if (!isAuthorized) {
-    throw new ApiError(
-      httpStatus.UNAUTHORIZED,
-      "Unauthorized access. Please log in."
-    );
-  }
+  // const isAuthorized = utilities.verifiedTokenAndDb(token);
+  // if (!isAuthorized) {
+  //   throw new ApiError(
+  //     httpStatus.UNAUTHORIZED,
+  //     "Unauthorized access. Please log in."
+  //   );
+  // }
 
   const project = await ProjectService.getSingleProject(token, projectId);
 

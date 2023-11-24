@@ -82,16 +82,17 @@ const getUserByUserName = async (userName: string): Promise<IUser | null> => {
     attributes: { exclude: ["password"] },
   });
   if (!user) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "User Not Found");
+    throw new ApiError(httpStatus.NOT_FOUND, "User Not Found");
   }
+
   const userPlainData = user.toJSON() as IUser;
   return userPlainData;
 };
+
 const getUserInfoById = async (userId: number): Promise<IUser | null> => {
   if (!userId) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found");
   }
-  console.log(userId, "this is for checking");
 
   const findUser = await User.findByPk(userId, {
     attributes: {

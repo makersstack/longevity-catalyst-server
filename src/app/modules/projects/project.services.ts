@@ -247,7 +247,14 @@ const getAllProjectsByUser = async (paginationOptions: IPaginationOptons) => {
     offset: skip,
     limit,
     order: [] as [string, string][],
-    include: User,
+    include: [
+      {
+        model: User,
+        attributes: {
+          exclude: ["password"],
+        },
+      },
+    ],
   };
 
   if (sortBy && sortOrder) {
@@ -261,16 +268,16 @@ const getAllProjectsByUser = async (paginationOptions: IPaginationOptons) => {
   const formattedProjects = projects.rows.map((project: any) => {
     return {
       id: project.id,
-      projectTitle: project.project_name,
-      projectDesc: project.project_desc,
+      project_name: project.project_name,
+      project_desc: project.project_desc,
       createdAt: project.createdAt,
       commentsCount: project.commentsCount,
       sharesCount: project.sharesCount,
-      user: {
+      User: {
         id: project.User.id,
-        userName: project.User.username,
-        userImage: project.User.profileImage,
-        fullName: project.User.full_name,
+        username: project.User.username,
+        profileImage: project.User.profileImage,
+        full_name: project.User.full_name,
       },
     };
   });
