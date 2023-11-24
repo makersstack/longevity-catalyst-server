@@ -121,6 +121,32 @@ const getAllProjects = catchAsync(
   }
 );
 
+const getAllProjectsByUsername = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const filters = pick(req.query, projectFilterableFields);
+    const paginationOptions = pick(req.query, paginationFileds);
+    const token = req.headers.authorization;
+    const username = String(req.params.username);
+    if (!username) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+    }
+
+    const result = await ProjectService.getAllProjectsByUsername(
+      filters,
+      paginationOptions,
+      username
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Projects retrieved successfully",
+      meta: result.meta,
+      data: result.data,
+    });
+  }
+);
+
 const getSingleProject = catchAsync(async (req: Request, res: Response) => {
   const token = req.headers.authorization;
   const projectId = Number(req.params.id);
@@ -167,6 +193,7 @@ export const projectController = {
   createProject,
   updateProject,
   getAllProjects,
+  getAllProjectsByUsername,
   getAllProjectsByUser,
   getSingleProject,
   deleteProject,
