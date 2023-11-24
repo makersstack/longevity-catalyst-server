@@ -143,6 +143,75 @@ const getAllProjects = async (
   return responseData;
 };
 
+const getAllProjectsByUsername = async (
+  filters: IProjectFilters,
+  paginationOptions: IPaginationOptons,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  username: string
+) => {
+  const user = await User.findOne({
+    where: { username },
+    attributes: { exclude: ["password"] },
+  });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User Not Found");
+  }
+  const { id } = user.toJSON();
+  // For Search
+  const { searchTerm, ...filtersData } = filters;
+  const andCondition = [];
+  if (searchTerm) {
+    andCondition.push({
+      [Op.or]: projectSearchableFields.map((field) => ({
+        [field]: {
+          [Op.like]: `%${searchTerm.toLowerCase()}%`,
+        },
+      })),
+    });
+  }
+
+  // For Filter
+  if (Object.keys(filtersData).length) {
+    andCondition.push({
+      [Op.and]: Object.entries(filtersData).map(([field, value]) => ({
+        [field]: value,
+      })),
+    });
+  }
+  // For Pagination
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  const options = {
+    where: {
+      [Op.and]: andCondition,
+      authorId: id,
+    },
+    offset: skip,
+    limit,
+    order: [] as [string, string][],
+    include: User,
+  };
+
+  if (sortBy && sortOrder) {
+    options.order.push([sortBy, sortOrder]);
+  }
+
+  const result = await Project.findAndCountAll(options);
+
+  const total = result.count;
+
+  const responseData: IGenericResponse<Project[]> = {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result.rows,
+  };
+  return responseData;
+};
+
 const getSingleProject = async (token: string, projectId: number) => {
   const getUserInfo = utilities.tokenToUserInfo(token);
   if (!getUserInfo) {
@@ -220,6 +289,7 @@ const getAllProjectsByUser = async (paginationOptions: IPaginationOptons) => {
 export const ProjectService = {
   createProject,
   getAllProjects,
+  getAllProjectsByUsername,
   getAllProjectsByUser,
   getSingleProject,
   updateProject,
