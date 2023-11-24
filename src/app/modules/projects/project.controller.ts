@@ -162,6 +162,29 @@ const getAllProjectsByUser = catchAsync(
     });
   }
 );
+// Not Perfectly Work
+const getAllProjectsByUsername = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { username } = req.params;
+    console.log(username);
+    const filters = pick(req.query, projectFilterableFields);
+    const paginationOptions = pick(req.query, paginationFileds);
+
+    const result = await ProjectService.getAllProjectsByUsername(
+      username,
+      filters,
+      paginationOptions
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Projects retrieved successfully",
+      meta: result.meta,
+      data: result.data,
+    });
+  }
+);
 
 export const projectController = {
   createProject,
@@ -170,4 +193,5 @@ export const projectController = {
   getAllProjectsByUser,
   getSingleProject,
   deleteProject,
+  getAllProjectsByUsername,
 };

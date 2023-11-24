@@ -111,17 +111,17 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 // For Single users
 const getUserByUserName = catchAsync(async (req: Request, res: Response) => {
   const userName = req.params.username;
-  const token = req.headers.authorization;
-  if (!token) {
-    throw new ApiError(
-      httpStatus.UNAUTHORIZED,
-      "Unauthorized access. Please log in."
-    );
-  }
-  const isAuthorized = utilities.verifiedTokenAndDb(token);
-  if (!isAuthorized) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
-  }
+  // const token = req.headers.authorization;
+  // if (!token) {
+  //   throw new ApiError(
+  //     httpStatus.UNAUTHORIZED,
+  //     "Unauthorized access. Please log in."
+  //   );
+  // }
+  // const isAuthorized = utilities.verifiedTokenAndDb(token);
+  // if (!isAuthorized) {
+  //   throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+  // }
 
   const userDetails = await userService.getUserByUserName(userName);
 

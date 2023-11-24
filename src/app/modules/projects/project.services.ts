@@ -224,6 +224,92 @@ const getAllProjectsByUser = async (paginationOptions: IPaginationOptons) => {
   return responseData;
 };
 
+// Not Perfectly Work
+const getAllProjectsByUsername = async (
+  userName: string,
+  filters: IProjectFilters,
+  paginationOptions: IPaginationOptons
+) => {
+  const user = await User.findOne({
+    where: { username: userName },
+    attributes: { exclude: ["password"] },
+  });
+
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User Not Found");
+  }
+  const authorId = user?.id;
+
+  // For Search
+  const { searchTerm, ...filtersData } = filters;
+  const andCondition = [];
+
+  if (searchTerm) {
+    andCondition.push({
+      [Op.or]: projectSearchableFields.map((field) => ({
+        [field]: {
+          [Op.like]: `%${searchTerm.toLowerCase()}%`,
+        },
+      })),
+    });
+  }
+
+  // For Filter
+  if (Object.keys(filtersData).length) {
+    andCondition.push({
+      [Op.and]: Object.entries(filtersData).map(([field, value]) => ({
+        [field]: value,
+      })),
+    });
+  }
+  // For Pagination
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
+  interface WhereOptions {
+    [key: string]: any;
+  }
+  const findOptions = {
+    where: {} as WhereOptions,
+    offset: skip,
+    limit,
+    order: [] as [string, string][],
+    include: [
+      {
+        model: User,
+        attributes: {
+          exclude: ["password"],
+        },
+      },
+    ],
+  };
+
+  if (authorId !== null) {
+    findOptions.where.authorId = authorId;
+  }
+
+  if (sortBy && sortOrder) {
+    findOptions.order.push([sortBy, sortOrder]);
+  }
+  findOptions.where = {
+    ...findOptions.where,
+    ...andCondition,
+  };
+
+  const result = await Project.findAndCountAll(findOptions);
+
+  const total = result.count;
+
+  const responseData: IGenericResponse<Project[]> = {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result.rows,
+  };
+  return responseData;
+};
+
 export const ProjectService = {
   createProject,
   getAllProjects,
@@ -231,4 +317,5 @@ export const ProjectService = {
   getSingleProject,
   updateProject,
   deleteProject,
+  getAllProjectsByUsername,
 };
