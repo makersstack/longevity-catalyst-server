@@ -143,11 +143,80 @@ const getAllProjects = async (
   return responseData;
 };
 
-const getSingleProject = async (projectId: number) => {
-  // const getUserInfo = utilities.tokenToUserInfo(token);
-  // if (!getUserInfo) {
-  //   throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
-  // }
+const getAllProjectsByUsername = async (
+  filters: IProjectFilters,
+  paginationOptions: IPaginationOptons,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  username: string
+) => {
+  const user = await User.findOne({
+    where: { username },
+    attributes: { exclude: ["password"] },
+  });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User Not Found");
+  }
+  const { id } = user.toJSON();
+  // For Search
+  const { searchTerm, ...filtersData } = filters;
+  const andCondition = [];
+  if (searchTerm) {
+    andCondition.push({
+      [Op.or]: projectSearchableFields.map((field) => ({
+        [field]: {
+          [Op.like]: `%${searchTerm.toLowerCase()}%`,
+        },
+      })),
+    });
+  }
+
+  // For Filter
+  if (Object.keys(filtersData).length) {
+    andCondition.push({
+      [Op.and]: Object.entries(filtersData).map(([field, value]) => ({
+        [field]: value,
+      })),
+    });
+  }
+  // For Pagination
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  const options = {
+    where: {
+      [Op.and]: andCondition,
+      authorId: id,
+    },
+    offset: skip,
+    limit,
+    order: [] as [string, string][],
+    include: User,
+  };
+
+  if (sortBy && sortOrder) {
+    options.order.push([sortBy, sortOrder]);
+  }
+
+  const result = await Project.findAndCountAll(options);
+
+  const total = result.count;
+
+  const responseData: IGenericResponse<Project[]> = {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result.rows,
+  };
+  return responseData;
+};
+
+const getSingleProject = async (token: string, projectId: number) => {
+  const getUserInfo = utilities.tokenToUserInfo(token);
+  if (!getUserInfo) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+  }
   const project = await Project.findByPk(projectId, {
     include: [
       {
@@ -224,98 +293,12 @@ const getAllProjectsByUser = async (paginationOptions: IPaginationOptons) => {
   return responseData;
 };
 
-// Not Perfectly Work
-const getAllProjectsByUsername = async (
-  userName: string,
-  filters: IProjectFilters,
-  paginationOptions: IPaginationOptons
-) => {
-  const user = await User.findOne({
-    where: { username: userName },
-    attributes: { exclude: ["password"] },
-  });
-
-  if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User Not Found");
-  }
-  const authorId = user?.id;
-
-  // For Search
-  const { searchTerm, ...filtersData } = filters;
-  const andCondition = [];
-
-  if (searchTerm) {
-    andCondition.push({
-      [Op.or]: projectSearchableFields.map((field) => ({
-        [field]: {
-          [Op.like]: `%${searchTerm.toLowerCase()}%`,
-        },
-      })),
-    });
-  }
-
-  // For Filter
-  if (Object.keys(filtersData).length) {
-    andCondition.push({
-      [Op.and]: Object.entries(filtersData).map(([field, value]) => ({
-        [field]: value,
-      })),
-    });
-  }
-  // For Pagination
-  const { page, limit, skip, sortBy, sortOrder } =
-    paginationHelpers.calculatePagination(paginationOptions);
-  interface WhereOptions {
-    [key: string]: any;
-  }
-  const findOptions = {
-    where: {} as WhereOptions,
-    offset: skip,
-    limit,
-    order: [] as [string, string][],
-    include: [
-      {
-        model: User,
-        attributes: {
-          exclude: ["password"],
-        },
-      },
-    ],
-  };
-
-  if (authorId !== null) {
-    findOptions.where.authorId = authorId;
-  }
-
-  if (sortBy && sortOrder) {
-    findOptions.order.push([sortBy, sortOrder]);
-  }
-  findOptions.where = {
-    ...findOptions.where,
-    ...andCondition,
-  };
-
-  const result = await Project.findAndCountAll(findOptions);
-
-  const total = result.count;
-
-  const responseData: IGenericResponse<Project[]> = {
-    meta: {
-      page,
-      limit,
-      total,
-    },
-    data: result.rows,
-  };
-  return responseData;
-};
-
 export const ProjectService = {
   createProject,
   getAllProjects,
+  getAllProjectsByUsername,
   getAllProjectsByUser,
   getSingleProject,
   updateProject,
   deleteProject,
-  getAllProjectsByUsername,
 };

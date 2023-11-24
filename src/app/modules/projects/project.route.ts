@@ -10,7 +10,7 @@ const router = express.Router();
 router.get("/", projectController.getAllProjects);
 router.get("/user", projectController.getAllProjectsByUser);
 router.get("/:id", projectController.getSingleProject);
-router.get("/:username", projectController.getAllProjectsByUsername);
+router.get("/user/:username", projectController.getAllProjectsByUsername);
 
 router.post("/create", projectController.createProject);
 router.delete(
