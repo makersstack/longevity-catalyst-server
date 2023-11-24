@@ -1,10 +1,10 @@
-// import express from "express";
-// import { likeController } from "./like.controller";
+import express from "express";
+import { likeController } from "./like.controller";
 
-// const router = express.Router();
+const router = express.Router();
 
-// // Define routes
-// router.post("/", likeController.createLike);
-// router.get("/", likeController.getAllLikes);
+// Define routes
+router.post("/", likeController.createOrRemoveLike);
+router.get("/", likeController.getAllLikesByPost);
 
-// export const LikeRouter = router;
+export const LikeRouter = router;

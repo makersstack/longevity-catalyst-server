@@ -1,5 +1,4 @@
 // import { DataTypes, Model, Sequelize } from "sequelize";
-// import VoteAttributes from "./vote.interface";
 
 // class VoteModel extends Model {
 //   public id!: number;

@@ -7,13 +7,13 @@ import ApiError from "../../../errors/ApiError";
 import { utilities } from "../../../helpers/utilities";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
-import { IResponse, IUser } from "./user.interface";
+import { IResponse } from "./user.interface";
 import { userService } from "./user.services";
 
 // Create a new user
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userData: IUser = req.body;
+    const userData = req.body;
 
     if (req.file) {
       // @ts-ignore
@@ -28,13 +28,8 @@ const createUser = catchAsync(
 
         const userAllData = await userService.createUser(userData);
 
-        if (!userAllData) {
-          throw new ApiError(
-            httpStatus.BAD_REQUEST,
-            "Error creating user in controller"
-          );
-        }
-        sendResponse<IResponse>(res, {
+        // sendResponse<IResponse>(res, {
+        sendResponse(res, {
           statusCode: httpStatus.OK,
           success: true,
           message: "User created successfully!",
@@ -137,9 +132,29 @@ const getUserByUserName = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getUserInfoById = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.id;
+
+  if (!userId) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  const convertId = Number(userId);
+
+  const result = await userService.getUserInfoById(convertId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User retrif successful",
+    data: result,
+  });
+});
+
 export const UserController = {
   createUser,
   updateUser,
   getAllUsers,
   getUserByUserName,
+  getUserInfoById,
 };

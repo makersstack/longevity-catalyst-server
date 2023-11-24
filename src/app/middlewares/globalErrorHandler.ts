@@ -17,7 +17,7 @@ const globalErrorHandler: ErrorRequestHandler = (
     : errorlogger.error(`🐱‍🏍 globalErrorHandler ~~`, error);
 
   let statusCode = 500;
-  let message = "Something went wrong !";
+  let message = "Something went wrong!";
   let errorMessages: IGenericErrorMessage[] = [];
 
   if (error?.name === "CastError") {
@@ -37,15 +37,26 @@ const globalErrorHandler: ErrorRequestHandler = (
         ]
       : [];
   } else if (error instanceof Error) {
-    message = error?.message;
-    errorMessages = error?.message
-      ? [
-          {
-            path: "",
-            message: error?.message,
-          },
-        ]
-      : [];
+    if (error.name === "TokenExpiredError") {
+      statusCode = 401;
+      message = "Forbidden - Token Expired";
+      errorMessages = [
+        {
+          path: "JWT",
+          message: "Token has expired.",
+        },
+      ];
+    } else {
+      message = error?.message;
+      errorMessages = error?.message
+        ? [
+            {
+              path: "",
+              message: error?.message,
+            },
+          ]
+        : [];
+    }
   }
   res.status(statusCode).json({
     success: false,

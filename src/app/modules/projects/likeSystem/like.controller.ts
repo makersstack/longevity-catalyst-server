@@ -8,7 +8,7 @@ import { likeService } from "./like.services";
 const createOrRemoveLike = catchAsync(async (req: Request, res: Response) => {
   const token = req.headers.authorization;
   if (!token) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Sorry");
+    throw new ApiError(httpStatus.UNAUTHORIZED, "UNAUTHORIZED");
   }
 
   const postId = req.params;

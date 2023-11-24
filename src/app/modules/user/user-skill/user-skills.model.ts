@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../../config/sequelize-config";
+import { Skill } from "../../skills/skills.model";
 import { User } from "../user.model";
 
 class UserSkill extends Model {}
@@ -21,25 +22,24 @@ UserSkill.init(
         key: "id",
       },
     },
-    skillName: {
-      type: DataTypes.TEXT,
+    skillId: {
+      type: DataTypes.INTEGER,
       allowNull: false,
-      get() {
-        return JSON.parse(this.getDataValue("skillName"));
-      },
-      set(value) {
-        this.setDataValue("skillName", JSON.stringify(value));
+      references: {
+        model: Skill,
+        key: "id",
       },
     },
   },
   {
     sequelize,
     modelName: "UserSkill",
-    tableName: "user_skills",
+    tableName: "user_skill",
     timestamps: false,
   }
 );
 
 UserSkill.belongsTo(User, { foreignKey: "userId" });
+UserSkill.belongsTo(Skill, { foreignKey: "skillId" });
 
 export { UserSkill };

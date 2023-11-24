@@ -173,15 +173,11 @@ const getSingleProject = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getAllProjectsForDashboard = catchAsync(
+const getAllProjectsByUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const filters = pick(req.query, projectFilterableFields);
     const paginationOptions = pick(req.query, paginationFileds);
 
-    const result = await ProjectService.getAllProjectsForDashboard(
-      filters,
-      paginationOptions
-    );
+    const result = await ProjectService.getAllProjectsByUser(paginationOptions);
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -197,8 +193,8 @@ export const projectController = {
   createProject,
   updateProject,
   getAllProjects,
-  getAllProjectsForDashboard,
   getAllProjectsByUsername,
+  getAllProjectsByUser,
   getSingleProject,
   deleteProject,
 };

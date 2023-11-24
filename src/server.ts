@@ -20,7 +20,6 @@ async function main() {
 
   process.on("unhandledRejection", (error) => {
     if (server) {
-      errorlogger.error("Unhandled Rejection:", error);
       server.close(() => {
         errorlogger.error(error);
         process.exit(1);
