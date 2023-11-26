@@ -7,14 +7,24 @@ import httpStatus from "http-status";
 
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 import routers from "./app/routes";
+import config from "./config";
 import sequelize from "./config/sequelize-config";
 import { errorlogger, logger } from "./shared/logger";
 
 const app: Application = express();
 
+const allowedOrigins = config.allowed_origins?.split(",") ?? [];
+
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: function (origin, callback) {
+      // Check if the request origin is included in the allowed origins array
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
