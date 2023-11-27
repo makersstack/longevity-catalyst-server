@@ -6,6 +6,7 @@ import { IUser } from "./user.interface";
 class User extends Model<IUser> {
   public id!: number;
   public username!: string;
+  public password!: string;
 
   static async isUserExist(identifier: string) {
     return User.findOne({

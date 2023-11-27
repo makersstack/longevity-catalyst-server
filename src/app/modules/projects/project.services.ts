@@ -84,7 +84,9 @@ const getAllProjects = async (
 ) => {
   // For Search
   const { searchTerm, ...filtersData } = filters;
+
   const andCondition = [];
+
   if (searchTerm) {
     andCondition.push({
       [Op.or]: projectSearchableFields.map((field) => ({
@@ -146,7 +148,6 @@ const getAllProjects = async (
 const getAllProjectsByUsername = async (
   filters: IProjectFilters,
   paginationOptions: IPaginationOptons,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   username: string
 ) => {
   const user = await User.findOne({
@@ -178,6 +179,7 @@ const getAllProjectsByUsername = async (
       })),
     });
   }
+
   // For Pagination
   const { page, limit, skip, sortBy, sortOrder } =
     paginationHelpers.calculatePagination(paginationOptions);

@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import httpStatus from "http-status";
 import config from "../../../config";
+import ApiError from "../../../errors/ApiError";
+import { utilities } from "../../../helpers/utilities";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import {
@@ -48,9 +50,41 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   // res.cookie("refreshToken", refreshToken, cookieOptions);
 
   sendResponse<IRefreshTokenResponse>(res, {
-    statusCode: 200,
+    statusCode: httpStatus.OK,
     success: true,
     message: "Access token successfully extended!",
+    data: result,
+  });
+});
+
+const changePassword = catchAsync(async (req: Request, res: Response) => {
+  const passData = req.body;
+  const token = req.headers.authorization;
+
+  if (!token) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "Unauthorized access. Please log in."
+    );
+  }
+
+  const isAuthorized = utilities.verifiedTokenAndDb(token);
+
+  if (!isAuthorized) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+  }
+
+  if (!passData) {
+    throw new ApiError(httpStatus.NOT_ACCEPTABLE, "NOT_ACCEPTABLE");
+  }
+  const getId = token;
+  const userId = Number(getId);
+  const result = await AuthService.changePassword(userId, passData);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Password change successfully!",
     data: result,
   });
 });
@@ -58,4 +92,5 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 export const AuthController = {
   loginUser,
   refreshToken,
+  changePassword,
 };
