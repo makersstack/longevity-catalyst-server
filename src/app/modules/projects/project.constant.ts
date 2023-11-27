@@ -1,16 +1,15 @@
 export const projectFilterableFields = [
   "searchTerm",
-  "projectTitle",
-  "projectTime",
-  "projectDescription",
+  "project_name",
+  "project_desc",
   "id",
   "upVoteCount",
   "downVoteCount",
 ];
 
 export const projectSearchableFields = [
-  "projectTitle",
-  "projectTime",
-  "projectDescription",
+  "project_name",
+  "project_desc",
+  "primary_category",
   "id",
 ];

@@ -12,7 +12,7 @@ import { ProjectData } from "./project.interface";
 import { ProjectService } from "./project.services";
 
 const createProject = catchAsync(async (req: Request, res: Response) => {
-  const ReqprojectData = req.body;
+  const reqprojectData = req.body;
   const token = req.headers.authorization;
   if (!token) {
     throw new ApiError(
@@ -20,12 +20,14 @@ const createProject = catchAsync(async (req: Request, res: Response) => {
       "Unauthorized access. Please log in."
     );
   }
+
   const isAuthorized = utilities.verifiedTokenAndDb(token);
+
   if (!isAuthorized) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
   }
-  console.log(ReqprojectData);
-  const project = await ProjectService.createProject(token, ReqprojectData);
+
+  const project = await ProjectService.createProject(token, reqprojectData);
 
   sendResponse<ProjectData>(res, {
     statusCode: httpStatus.OK,

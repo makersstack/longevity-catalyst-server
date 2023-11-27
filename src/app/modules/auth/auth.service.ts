@@ -99,7 +99,19 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
   };
 };
 
+const changePassword = async (userId: number, passData: string) => {
+  const user = await User.findByPk(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+  user.password = passData;
+
+  await user.save();
+  return user;
+};
+
 export const AuthService = {
   loginUser,
   refreshToken,
+  changePassword,
 };
