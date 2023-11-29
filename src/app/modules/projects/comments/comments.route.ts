@@ -7,37 +7,42 @@ const router = express.Router();
 
 // Define routes
 router.post(
-  "/",
+  "/:projectId/comment",
   auth(
     ENUM_USER_ROLE.REGULARUSER,
     ENUM_USER_ROLE.CONTRIBUTOR,
+    ENUM_USER_ROLE.RESEARCHER,
     ENUM_USER_ROLE.ADMIN
   ),
   commentController.createComment
 );
 router.get(
-  "/:id",
+  "/:projectId/comments",
   auth(
     ENUM_USER_ROLE.REGULARUSER,
+    ENUM_USER_ROLE.RESEARCHER,
     ENUM_USER_ROLE.CONTRIBUTOR,
     ENUM_USER_ROLE.ADMIN
   ),
-  commentController.getSingleComment
+  // TODO NEED WORK
+  commentController.getAllCommentByProject
 );
 router.delete(
-  "/:id",
+  "/comment/:commentId",
   auth(
     ENUM_USER_ROLE.REGULARUSER,
     ENUM_USER_ROLE.CONTRIBUTOR,
+    ENUM_USER_ROLE.RESEARCHER,
     ENUM_USER_ROLE.ADMIN
   ),
   commentController.deleteComment
 );
 router.patch(
-  "/:id",
+  "/:projectId/comment/:commentId",
   auth(
     ENUM_USER_ROLE.REGULARUSER,
     ENUM_USER_ROLE.CONTRIBUTOR,
+    ENUM_USER_ROLE.RESEARCHER,
     ENUM_USER_ROLE.ADMIN
   ),
   commentController.updateComment

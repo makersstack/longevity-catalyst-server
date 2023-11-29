@@ -3,7 +3,7 @@ interface Reply {
   projectId: string;
   userId: string;
   commentId: string;
-  reply: string;
+  replyText: string;
   createdAt: Date;
   updatedAt: Date;
 }

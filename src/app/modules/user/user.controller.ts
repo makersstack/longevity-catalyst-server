@@ -47,15 +47,16 @@ const createUser = catchAsync(
       }
       const { password, ...userAllInfo } = result;
 
-      sendResponse<IResponse>(res, {
+      sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
         message: "User created successfully!",
-        data: userAllInfo,
+        data: true,
       });
     }
   }
 );
+
 const updateUser = catchAsync(async (req: Request, res: Response) => {
   const userName = req.params.username;
   const updateData = req.body;
