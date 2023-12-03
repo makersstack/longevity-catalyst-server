@@ -52,8 +52,28 @@ const getAllLikesByUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// project like operation
+const projectLikeOperation = catchAsync(async (req: Request, res: Response) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "UNAUTHORIZED");
+  }
+
+  const operationData = req.body;
+
+  const result = await likeService.createOrRemoveLike(token, operationData);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Operation successfully",
+    data: result,
+  });
+});
+
 export const likeController = {
   createOrRemoveLike,
   getAllLikesByPost,
   getAllLikesByUser,
+  projectLikeOperation,
 };
