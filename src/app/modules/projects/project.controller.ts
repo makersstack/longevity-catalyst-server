@@ -99,9 +99,13 @@ const getAllProjects = catchAsync(
     const filters = pick(req.query, projectFilterableFields);
     const paginationOptions = pick(req.query, paginationFileds);
     const token = req.headers.authorization;
-    // if (!token) {
-    //   throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
-    // }
+    let userToken;
+
+    if (!token) {
+      userToken = null;
+    } else {
+      userToken = token;
+    }
 
     // const isAuthorized = utilities.verifiedTokenAndDb(token);
     // if (!isAuthorized) {
@@ -109,6 +113,7 @@ const getAllProjects = catchAsync(
     // }
 
     const result = await ProjectService.getAllProjects(
+      userToken,
       filters,
       paginationOptions
     );

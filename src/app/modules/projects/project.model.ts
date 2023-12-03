@@ -8,6 +8,30 @@ class Project extends Model {
   static async findProjectById(id: number) {
     return Project.findByPk(id);
   }
+
+  static async findAllWithUserLikes(id: number, options: any) {
+    const projects = await Project.findAll({
+      ...options, // Spread the options object
+      attributes: {
+        include: [
+          [
+            sequelize.literal(`(
+              SELECT COUNT(*) 
+              FROM project_likes AS user_like 
+              WHERE user_like.project_id = Project.id 
+              AND user_like.authorId = ${id}
+            )`),
+            "isLikedByUser",
+          ],
+        ],
+      },
+    });
+    const count = await Project.count({
+      ...options,
+    });
+
+    return { count, projects };
+  }
 }
 
 Project.init(

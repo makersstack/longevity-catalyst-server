@@ -3,38 +3,50 @@
 import httpStatus from "http-status";
 import ApiError from "../../../../errors/ApiError";
 import { jwtHelpers } from "../../../../helpers/jwtHelpers";
-import { LikeModel } from "./like.model";
+import { utilities } from "../../../../helpers/utilities";
+import { ProjectLike } from "./like.model";
 
-const createOrRemoveLike = async (token: string, postId: any) => {
-  const userInfo = jwtHelpers.getUserInfoByToken(token);
+const createOrRemoveLike = async (token: string, operationData: any) => {
+  const isAuthorized = utilities.verifiedTokenAndDb(token);
+  if (!isAuthorized) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+  }
+
+  const userInfo = (await utilities.tokenToUserInfo(token)) as any;
+
   if (!userInfo) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Error creating like");
+    throw new ApiError(httpStatus.NOT_FOUND, "User Not Found");
   }
 
-  const { userId, role } = userInfo;
-  if (!userId || !postId || !role) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Error creating like");
-  }
+  const { projectId, status } = operationData;
 
-  // Checking for like
-  const existingLike = await LikeModel.findOne({ where: { userId, postId } });
+  const { id } = userInfo;
+  const likeData = {
+    authorId: id,
+    project_id: projectId,
+  };
 
-  if (existingLike) {
-    await LikeModel.destroy();
-    return false;
+  const existingLike = await ProjectLike.findOne({
+    where: likeData,
+  });
+
+  if (status) {
+    if (!existingLike) {
+      await ProjectLike.create(likeData);
+    }
   } else {
-    const likeData = {
-      userId,
-      postId,
-    };
-    await LikeModel.create(likeData);
-
-    return likeData;
+    if (existingLike) {
+      await ProjectLike.destroy({
+        where: likeData,
+      });
+    }
   }
+
+  return existingLike;
 };
 
 const getAllLikesByPost = async (projectId: any) => {
-  const result = await LikeModel.findAll({
+  const result = await ProjectLike.findAll({
     where: { likedItemId: projectId },
   });
 
@@ -52,7 +64,7 @@ const getAllLikesByUser = async (token: string) => {
     throw new ApiError(httpStatus.BAD_REQUEST, "User are no likes");
   }
 
-  const result = await LikeModel.findAll({
+  const result = await ProjectLike.findAll({
     where: { userId },
   });
 
