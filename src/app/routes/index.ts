@@ -7,6 +7,7 @@ import { LikeRouter } from "../modules/projects/likeSystem/like.route";
 import { projectCategoryRoute } from "../modules/projects/porojectCategory/projectCategory.route";
 import { ProjectRouter } from "../modules/projects/project.route";
 import { replyRoute } from "../modules/projects/reply/reply.route";
+import { VoteRouter } from "../modules/projects/voteSystem/vote.route";
 import { userSkillRoute } from "../modules/skills/skills.route";
 import { imageRoute } from "../modules/user/imageController";
 import { userSocailRoute } from "../modules/user/user-activities/socail.router";
@@ -62,6 +63,10 @@ const moduleRoutes = [
   {
     path: "/like",
     route: LikeRouter,
+  },
+  {
+    path: "/vote",
+    route: VoteRouter,
   },
 ];
 

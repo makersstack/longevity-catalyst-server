@@ -1,128 +1,86 @@
-// import httpStatus from "http-status";
-// import ApiError from "../../../../errors/ApiError";
-// import { jwtHelpers } from "../../../../helpers/jwtHelpers";
-// import { Project } from "../project.model";
-// import { VoteModel } from "./vote.modle";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import httpStatus from "http-status";
+import ApiError from "../../../../errors/ApiError";
+import { jwtHelpers } from "../../../../helpers/jwtHelpers";
+import { utilities } from "../../../../helpers/utilities";
+import { ProjectLike } from "../likeSystem/like.model";
+import { ProjectVote } from "./vote.model";
 
-// const createOrRemoveVote = async (voteData: {
-//   token: string;
-//   projectId: number;
-//   voteType: "up" | "down";
-// }) => {
-//   const { token, projectId, voteType } = voteData;
+const createOrRemoveVote = async (token: string, operationData: any) => {
+  const isAuthorized = utilities.verifiedTokenAndDb(token);
+  if (!isAuthorized) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+  }
 
-//   const userInfo = jwtHelpers.getUserInfoByToken(token);
-//   if (!userInfo) {
-//     throw new ApiError(httpStatus.NOT_FOUND, "Error creating like");
-//   }
-//   const { userId } = userInfo;
+  const userInfo = (await utilities.tokenToUserInfo(token)) as any;
 
-//   // Check for user has already voted this item
-//   const existingVote = await VoteModel.findOne({
-//     where: { userId, projectId },
-//   });
+  if (!userInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User Not Found");
+  }
 
-//   // Include the project vote count
-//   const projectData = await Project.findByPk(projectId);
-//   if (!projectData) {
-//     throw new ApiError(httpStatus.BAD_REQUEST, "Project Not found");
-//   }
+  const { projectId, voteType, status } = operationData;
 
-//   if (existingVote) {
-//     if (existingVote.voteType === voteType) {
-//       // The user is changing their vote to the same type, remove the vote
-//       await existingVote.destroy();
+  const { id } = userInfo;
+  const voteData = {
+    authorId: id,
+    project_id: projectId,
+    voteType: voteType,
+  };
 
-//       // Update the vote count
-//       if (voteType === "up") {
-//         projectData.upVoteCount--;
-//       } else {
-//         projectData.downVoteCount--;
-//       }
-//     } else {
-//       // The user is changing their vote type, adjust the vote count
-//       if (existingVote.voteType === "up") {
-//         projectData.upVoteCount--;
-//       } else {
-//         projectData.downVoteCount--;
-//       }
+  const existingVote = await ProjectVote.findOne({
+    where: voteData,
+  });
 
-//       if (voteType === "up") {
-//         projectData.upVoteCount++;
-//       } else {
-//         projectData.downVoteCount++;
-//       }
+  if (status) {
+    if (!existingVote) {
+      await ProjectVote.destroy({
+        where: {
+          project_id: projectId,
+          authorId: id,
+        },
+      });
+      await ProjectVote.create(voteData);
+    }
+  } else {
+    if (existingVote) {
+      await ProjectVote.destroy({
+        where: voteData,
+      });
+    }
+  }
 
-//       existingVote.voteType = voteType;
-//       await existingVote.save();
-//     }
-//   } else {
-//     // If the user hasn't voted before, create a new vote
-//     await VoteModel.create({ userId, projectId, voteType });
+  return;
+};
 
-//     // Update the vote count
-//     if (voteType === "up") {
-//       projectData.upVoteCount++;
-//     } else {
-//       projectData.downVoteCount++;
-//     }
-//   }
-//   return voteData;
-// };
+const getAllVoteByPost = async (projectId: any) => {
+  const result = await ProjectLike.findAll({
+    where: { likedItemId: projectId },
+  });
 
-// const getVoteByProject = async (projectId: number) => {
-//   try {
-//     const projectData = await Project.findByPk(projectId);
-//     if (!projectData) {
-//       throw new ApiError(httpStatus.NOT_FOUND, "Project Not found");
-//     }
-//     const upVote = projectData.upVoteCount;
-//     const downVote = projectData.downVoteCount;
+  return result;
+};
 
-//     return {
-//       projectId: projectData.id,
-//       upVote,
-//       downVote,
-//       totalVoteCount: upVote - downVote,
-//     };
-//   } catch (error) {
-//     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Get Error");
-//   }
-// };
+const getAllVoteByUser = async (token: string) => {
+  const userInfo = jwtHelpers.getUserInfoByToken(token);
+  if (!userInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Error creating like");
+  }
 
-// const getVotebyUser = async (token: string) => {
-//   const userInfo = jwtHelpers.getUserInfoByToken(token);
-//   if (!userInfo) {
-//     throw new ApiError(httpStatus.NOT_FOUND, "Error creating like");
-//   }
-//   const { userId } = userInfo;
+  const { userId, role } = userInfo;
+  if (!userId || !role) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "User are no likes");
+  }
 
-//   const userVotes = await VoteModel.findAll({
-//     where: { userId },
-//   });
+  const result = await ProjectLike.findAll({
+    where: { userId },
+  });
 
-//   let upVoteCount = 0;
-//   let downVoteCount = 0;
+  return result;
+};
 
-//   userVotes.forEach((vote) => {
-//     if (vote.voteType === "up") {
-//       upVoteCount++;
-//     } else if (vote.voteType === "down") {
-//       downVoteCount--;
-//     }
-//   });
-
-//   const totalVoteCount = upVoteCount - downVoteCount;
-
-//   return {
-//     upVoteCount,
-//     downVoteCount,
-//     totalVoteCount,
-//   };
-// };
-
-// export const voteService = {
-//   createOrRemoveVote,
-//   getVoteByProject,
-//   getVotebyUser,
-// };
+export const VoteService = {
+  createOrRemoveVote,
+  getAllVoteByPost,
+  getAllVoteByUser,
+};
