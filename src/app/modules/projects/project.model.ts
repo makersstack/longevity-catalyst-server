@@ -9,7 +9,7 @@ class Project extends Model {
     return Project.findByPk(id);
   }
 
-  static async findAllWithUserLikes(id: number, options: any) {
+  static async findAllWithUserLikesVote(id: number, options: any) {
     const projects = await Project.findAll({
       ...options, // Spread the options object
       attributes: {
@@ -22,6 +22,15 @@ class Project extends Model {
               AND user_like.authorId = ${id}
             )`),
             "isLikedByUser",
+          ],
+          [
+            sequelize.literal(`(
+              SELECT voteType 
+              FROM project_vote AS user_vote 
+              WHERE user_vote.project_id = Project.id 
+              AND user_vote.authorId = ${id}
+            )`),
+            "VoteByUser",
           ],
         ],
       },

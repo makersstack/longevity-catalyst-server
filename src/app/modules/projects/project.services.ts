@@ -139,10 +139,10 @@ const getAllProjects = async (
 
   let result: any;
   let total: any;
-  // for user liked check
+  // for user liked and vote check
   if (userToken !== null) {
     const userInfo = (await utilities.tokenToUserInfo(userToken)) as any;
-    const { projects, count } = await Project.findAllWithUserLikes(
+    const { projects, count } = await Project.findAllWithUserLikesVote(
       userInfo.id,
       options
     );
