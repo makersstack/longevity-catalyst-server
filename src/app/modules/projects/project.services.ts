@@ -16,6 +16,7 @@ import {
   ProjectData,
 } from "./project.interface";
 import { Project } from "./project.model";
+import { ProjectVote } from "./voteSystem/vote.model";
 
 const createProject = async (
   token: string,
@@ -184,12 +185,31 @@ const getAllProjects = async (
           project_id: projectId,
         },
       });
+      // project vote counting
+      const upVote = await ProjectVote.count({
+        where: {
+          voteType: "up",
+          project_id: projectId,
+        },
+      });
+      const downVote = await ProjectVote.count({
+        where: {
+          voteType: "down",
+          project_id: projectId,
+        },
+      });
+      const voteCounts = {
+        total: upVote + downVote,
+        up: upVote,
+        down: downVote,
+      };
 
       // Add the authors details and total like count to the project data
       return {
         ...project.toJSON(), // Convert the project to a plain object
         likedUsers: authors, // Add the authors details as likedUsers
         totalLikes, // Add the total like count for the project
+        voteCounts: voteCounts,
       };
     })
   );

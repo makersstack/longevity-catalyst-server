@@ -181,14 +181,6 @@ Project.init(
     other_included: {
       type: DataTypes.TEXT("long"),
     },
-    upVoteCount: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-    },
-    downVoteCount: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-    },
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
