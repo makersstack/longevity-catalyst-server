@@ -1,60 +1,80 @@
 import { Request, Response } from "express";
 import httpStatus from "http-status";
+import { paginationFileds } from "../../../../constants/pagination";
 import ApiError from "../../../../errors/ApiError";
 import catchAsync from "../../../../shared/catchAsync";
+import pick from "../../../../shared/pick";
 import sendResponse from "../../../../shared/sendResponse";
 import { replyService } from "./reply.services";
 
-const createProject = catchAsync(async (req: Request, res: Response) => {
-  try {
-    const commentData = req.body;
-    const comment = await replyService.createReply(commentData);
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "Reply Created successfully!",
-      data: comment,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+const createReply = catchAsync(async (req: Request, res: Response) => {
+  const token = req.headers.authorization;
+  const replyText = req.body;
+  const projectId = Number(req.params.projectId);
+  const commentId = Number(req.params.commentId);
+
+  if (!token || !replyText || !projectId || !commentId) {
+    throw new ApiError(httpStatus.NOT_ACCEPTABLE, "Something is missing");
   }
+
+  const replyResult = await replyService.createReply(
+    token,
+    replyText,
+    projectId,
+    commentId
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Reply Created successfully!",
+    data: replyResult,
+  });
 });
 
 const updateReply = catchAsync(async (req: Request, res: Response) => {
-  try {
-    const projectId = req.params.id;
-    const projectData = req.body;
-    const updatedReply = await replyService.updateReply(projectId, projectData);
-    if (updatedReply) {
-      sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: "Reply Data Update successfully!",
-        data: updatedReply,
-      });
-    } else {
-      throw new ApiError(httpStatus.BAD_REQUEST, "Project not found");
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+  const token = req.headers.authorization;
+  const projectId = Number(req.params.projectId);
+  const commentId = Number(req.params.commentId);
+  const replyId = Number(req.params.replyId);
+  const replyText = req.body;
+
+  if (!token) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "You are not authorized");
   }
+
+  const updatedReply = await replyService.updateReply(
+    token,
+    projectId,
+    commentId,
+    replyId,
+    replyText
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Reply Data Update successfully!",
+    data: updatedReply,
+  });
 });
 
 const deleteReply = catchAsync(async (req: Request, res: Response) => {
-  try {
-    const projectId = req.params.id;
-    const deletedProject = await replyService.deleteReply(projectId);
-    if (deletedProject) {
-      res.status(204).end();
-    } else {
-      res.status(404).json({ error: "Project not found" });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+  const token = req.headers.authorization;
+  const replyId = Number(req.params.replyId);
+
+  if (!token || !replyId) {
+    throw new ApiError(httpStatus.NOT_ACCEPTABLE, "Not found creadiential");
   }
+
+  const deleteReplyResult = await replyService.deleteReply(token, replyId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Reply Successfully Deleted",
+    data: deleteReplyResult,
+  });
 });
 
 const getSingleReply = catchAsync(async (req: Request, res: Response) => {
@@ -71,10 +91,35 @@ const getSingleReply = catchAsync(async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+const getAllReplysByComment = catchAsync(
+  async (req: Request, res: Response) => {
+    const token = req.headers.authorization;
+    const paginationOptions = pick(req.query, paginationFileds);
+    const projectId = Number(req.params.projectId);
+    const commentId = Number(req.params.commentId);
 
+    if (!token) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorize");
+    }
+
+    const replys = await replyService.getAllReplyByComment(
+      projectId,
+      commentId,
+      paginationOptions
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Comments Rettrif successfylly",
+      data: replys,
+    });
+  }
+);
 export const replyController = {
-  createProject,
+  createReply,
   updateReply,
   deleteReply,
   getSingleReply,
+  getAllReplysByComment,
 };

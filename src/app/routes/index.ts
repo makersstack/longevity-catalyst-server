@@ -6,7 +6,6 @@ import { commentRoute } from "../modules/projects/comments/comments.route";
 import { LikeRouter } from "../modules/projects/likeSystem/like.route";
 import { projectCategoryRoute } from "../modules/projects/porojectCategory/projectCategory.route";
 import { ProjectRouter } from "../modules/projects/project.route";
-import { replyRoute } from "../modules/projects/reply/reply.route";
 import { VoteRouter } from "../modules/projects/voteSystem/vote.route";
 import { userSkillRoute } from "../modules/skills/skills.route";
 import { imageRoute } from "../modules/user/imageController";
@@ -40,12 +39,8 @@ const moduleRoutes = [
     route: ProjectRouter,
   },
   {
-    path: "/comment",
+    path: "/project",
     route: commentRoute,
-  },
-  {
-    path: "/reply",
-    route: replyRoute,
   },
   {
     path: "/upload",

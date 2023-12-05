@@ -1,7 +1,15 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../../config/sequelize-config";
+import { User } from "../../user/user.model";
+import { Project } from "../project.model";
 
-class Comment extends Model {}
+class Comment extends Model {
+  public id!: number;
+  public projectId!: number;
+  public userId!: number;
+  public commentText!: string;
+  public updatedAt!: Date;
+}
 
 Comment.init(
   {
@@ -13,14 +21,22 @@ Comment.init(
       allowNull: false,
     },
     userId: {
-      type: DataTypes.UUID,
+      type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: User,
+        key: "id",
+      },
     },
     projectId: {
-      type: DataTypes.UUID,
+      type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: Project,
+        key: "id",
+      },
     },
-    comment: {
+    commentText: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
@@ -39,5 +55,8 @@ Comment.init(
     tableName: "comments",
   }
 );
+
+Comment.belongsTo(User, { foreignKey: "userId" });
+Comment.belongsTo(Project, { foreignKey: "projectId" });
 
 export default Comment;
