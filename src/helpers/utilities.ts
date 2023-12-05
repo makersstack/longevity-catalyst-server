@@ -25,7 +25,6 @@ const getUserIdByToken = (token: string) => {
   const { userId } = verifiedToken;
   return userId;
 };
-
 const getUserRoleByToken = (token: string) => {
   const verifiedToken = jwtHelpers.verifyToken(
     token,

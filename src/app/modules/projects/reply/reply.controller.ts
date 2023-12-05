@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import httpStatus from "http-status";
+import { paginationFileds } from "../../../../constants/pagination";
 import ApiError from "../../../../errors/ApiError";
 import catchAsync from "../../../../shared/catchAsync";
+import pick from "../../../../shared/pick";
 import sendResponse from "../../../../shared/sendResponse";
 import { replyService } from "./reply.services";
 
@@ -89,10 +91,35 @@ const getSingleReply = catchAsync(async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+const getAllReplysByComment = catchAsync(
+  async (req: Request, res: Response) => {
+    const token = req.headers.authorization;
+    const paginationOptions = pick(req.query, paginationFileds);
+    const projectId = Number(req.params.projectId);
+    const commentId = Number(req.params.commentId);
 
+    if (!token) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorize");
+    }
+
+    const replys = await replyService.getAllReplyByComment(
+      projectId,
+      commentId,
+      paginationOptions
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Comments Rettrif successfylly",
+      data: replys,
+    });
+  }
+);
 export const replyController = {
   createReply,
   updateReply,
   deleteReply,
   getSingleReply,
+  getAllReplysByComment,
 };

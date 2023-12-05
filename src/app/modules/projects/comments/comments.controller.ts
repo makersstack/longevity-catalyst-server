@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import httpStatus from "http-status";
+import { paginationFileds } from "../../../../constants/pagination";
 import ApiError from "../../../../errors/ApiError";
 import catchAsync from "../../../../shared/catchAsync";
+import pick from "../../../../shared/pick";
 import sendResponse from "../../../../shared/sendResponse";
 import { commentService } from "./comments.services";
 
@@ -71,8 +73,13 @@ const deleteComment = catchAsync(async (req: Request, res: Response) => {
 
 const getAllCommentByProject = catchAsync(
   async (req: Request, res: Response) => {
-    const paginationOptions = req.body;
+    const paginationOptions = pick(req.query, paginationFileds);
     const projectId = Number(req.params.projectId);
+    const token = req.headers.authorization;
+
+    if (!token) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorize");
+    }
 
     const comments = await commentService.getAllCommentByProject(
       projectId,

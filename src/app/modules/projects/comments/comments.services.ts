@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 import ApiError from "../../../../errors/ApiError";
 import { paginationHelpers } from "../../../../helpers/paginationHelpers";
 import { utilities } from "../../../../helpers/utilities";
+import { User } from "../../user/user.model";
 import { Project } from "../project.model";
 import Comment from "./comments.model";
 
@@ -10,7 +11,7 @@ const createComment = async (
   token: string,
   projectId: number,
   commentText: string
-) => {
+): Promise<Comment | null> => {
   if (!token || !commentText || !projectId) {
     throw new ApiError(httpStatus.NOT_ACCEPTABLE, "Invalid input data");
   }
@@ -22,7 +23,7 @@ const createComment = async (
   const checkProject = await Project.findByPk(projectId);
 
   if (!checkProject) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Comment not found");
+    throw new ApiError(httpStatus.NOT_FOUND, "Project not found");
   }
 
   const createdComment = await Comment.create({
@@ -32,7 +33,7 @@ const createComment = async (
     createdAt: new Date(),
   });
 
-  return createdComment;
+  return createdComment.toJSON() as Comment;
 };
 
 const updateComment = async (
@@ -100,7 +101,6 @@ const getAllCommentByProject = async (
   if (!projectId) {
     throw new ApiError(httpStatus.NOT_FOUND, "Project are not found");
   }
-
   const { page, limit, skip, sortBy, sortOrder } =
     paginationHelpers.calculatePagination(paginationOptions);
 
@@ -111,6 +111,12 @@ const getAllCommentByProject = async (
     offset: skip,
     limit,
     order: [] as [string, string][],
+    include: [
+      {
+        model: User,
+        attributes: ["id", "full_name", "username", "email", "profileImage"],
+      },
+    ],
   };
   if (sortBy && sortOrder) {
     options.order.push([sortBy, sortOrder]);
