@@ -50,7 +50,26 @@ const createOrRemoveVote = async (token: string, operationData: any) => {
     }
   }
 
-  return;
+  // project current vote count
+  const upVote = await ProjectVote.count({
+    where: {
+      voteType: "up",
+      project_id: projectId,
+    },
+  });
+  const downVote = await ProjectVote.count({
+    where: {
+      voteType: "down",
+      project_id: projectId,
+    },
+  });
+  const voteCounts = {
+    total: upVote + downVote,
+    up: upVote,
+    down: downVote,
+  };
+
+  return voteCounts;
 };
 
 const getAllVoteByPost = async (projectId: any) => {
