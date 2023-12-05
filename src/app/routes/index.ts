@@ -3,8 +3,10 @@ import { AdminRoute } from "../modules/admin/admin.router";
 import { AuthRoutes } from "../modules/auth/auth.route";
 import { categoryRoute } from "../modules/projects/categories/categories.route";
 import { commentRoute } from "../modules/projects/comments/comments.route";
+import { LikeRouter } from "../modules/projects/likeSystem/like.route";
 import { projectCategoryRoute } from "../modules/projects/porojectCategory/projectCategory.route";
 import { ProjectRouter } from "../modules/projects/project.route";
+import { VoteRouter } from "../modules/projects/voteSystem/vote.route";
 import { userSkillRoute } from "../modules/skills/skills.route";
 import { imageRoute } from "../modules/user/imageController";
 import { userSocailRoute } from "../modules/user/user-activities/socail.router";
@@ -51,6 +53,15 @@ const moduleRoutes = [
   {
     path: "/category/project",
     route: projectCategoryRoute,
+  },
+
+  {
+    path: "/like",
+    route: LikeRouter,
+  },
+  {
+    path: "/vote",
+    route: VoteRouter,
   },
 ];
 

@@ -8,6 +8,7 @@ import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptons } from "../../../interfaces/pagination";
 import { User } from "../user/user.model";
 import { Categories } from "./categories/categories.model";
+import { ProjectLike } from "./likeSystem/like.model";
 import { projectSearchableFields } from "./project.constant";
 import {
   IApiResponseProjectData,
@@ -15,6 +16,7 @@ import {
   ProjectData,
 } from "./project.interface";
 import { Project } from "./project.model";
+import { ProjectVote } from "./voteSystem/vote.model";
 
 const createProject = async (
   token: string,
@@ -79,6 +81,7 @@ const deleteProject = async (projectId: string) => {
 // For sorting Every sorting separeted endpoint and with this filter data it's great point
 
 const getAllProjects = async (
+  userToken: string | null,
   filters: IProjectFilters,
   paginationOptions: IPaginationOptons
 ) => {
@@ -116,6 +119,7 @@ const getAllProjects = async (
     offset: skip,
     limit,
     order: [] as [string, string][],
+
     include: [
       {
         model: User,
@@ -126,13 +130,89 @@ const getAllProjects = async (
     ],
   };
 
+  // Update the include property in the options object
+
+  // Rest of the code...
+
   if (sortBy && sortOrder) {
     options.order.push([sortBy, sortOrder]);
   }
 
-  const result = await Project.findAndCountAll(options);
+  let result: any;
+  let total: any;
+  // for user liked and vote check
+  if (userToken !== null) {
+    const userInfo = (await utilities.tokenToUserInfo(userToken)) as any;
+    const { projects, count } = await Project.findAllWithUserLikesVote(
+      userInfo.id,
+      options
+    );
+    result = projects;
+    total = count;
+  } else {
+    const projects = await Project.findAndCountAll(options);
+    result = projects.rows;
+    total = result.count;
+  }
 
-  const total = result.count;
+  result = await Promise.all(
+    result.map(async (project: any) => {
+      const projectId = project.id; // Assuming 'id' is the project's ID field
+
+      // Fetch authorId for this project from ProjectLike
+      const projectLikeData = await ProjectLike.findAll({
+        where: {
+          project_id: projectId, // Filter by the project ID
+        },
+        order: [["createdAt", "DESC"]], // Order by createdAt in descending order
+        attributes: ["authorId"], // Select only authorId
+      });
+
+      // Extract the authorIds
+      const authorIds = projectLikeData.map((like: any) => like.authorId);
+
+      // Fetch user details for authorIds from the User model
+      const authors = await User.findAll({
+        where: {
+          id: authorIds, // Filter by the extracted authorIds
+        },
+        attributes: ["username", "profileImage"], // Define the attributes you want to retrieve
+      });
+
+      // Get the total like count for the project
+      const totalLikes = await ProjectLike.count({
+        where: {
+          project_id: projectId,
+        },
+      });
+      // project vote counting
+      const upVote = await ProjectVote.count({
+        where: {
+          voteType: "up",
+          project_id: projectId,
+        },
+      });
+      const downVote = await ProjectVote.count({
+        where: {
+          voteType: "down",
+          project_id: projectId,
+        },
+      });
+      const voteCounts = {
+        total: upVote + downVote,
+        up: upVote,
+        down: downVote,
+      };
+
+      // Add the authors details and total like count to the project data
+      return {
+        ...project.toJSON(), // Convert the project to a plain object
+        likedUsers: authors, // Add the authors details as likedUsers
+        totalLikes, // Add the total like count for the project
+        voteCounts: voteCounts,
+      };
+    })
+  );
 
   const responseData: IGenericResponse<Project[]> = {
     meta: {
@@ -140,7 +220,7 @@ const getAllProjects = async (
       limit,
       total,
     },
-    data: result.rows,
+    data: result,
   };
   return responseData;
 };

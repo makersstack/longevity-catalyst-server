@@ -1,84 +1,79 @@
-// import { Request, Response } from "express";
-// import httpStatus from "http-status";
-// import ApiError from "../../../../errors/ApiError";
-// import catchAsync from "../../../../shared/catchAsync";
-// import sendResponse from "../../../../shared/sendResponse";
-// import { voteService } from "./vote.services";
+import { Request, Response } from "express";
+import httpStatus from "http-status";
+import ApiError from "../../../../errors/ApiError";
+import catchAsync from "../../../../shared/catchAsync";
+import sendResponse from "../../../../shared/sendResponse";
+import { VoteService } from "./vote.services";
 
-// const createOrRemoveVote = catchAsync(async (req: Request, res: Response) => {
-//   const token = req.headers.authorization;
-//   const projectId: number = Number(req.params.projectId);
-//   const voteType: "up" | "down" = req.body;
+const createOrRemoveVote = catchAsync(async (req: Request, res: Response) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "UNAUTHORIZED");
+  }
 
-//   if (!token) {
-//     throw new ApiError(httpStatus.BAD_REQUEST, "Sorry");
-//   }
+  const postId = req.params;
 
-//   const result = await voteService.createOrRemoveVote({
-//     token,
-//     projectId,
-//     voteType,
-//   });
+  const result = await VoteService.createOrRemoveVote(token, postId);
 
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     success: true,
-//     message: "Users retrieved successfully",
-//     data: result,
-//   });
-// });
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Users retrieved successfully",
+    data: result,
+  });
+});
 
-// const getVotebyProject = catchAsync(async (req: Request, res: Response) => {
-//   try {
-//     const projectid = Number(req.params.projectId);
-//     const result = await voteService.getVoteByProject(projectid);
+const getAllVoteByPost = catchAsync(async (req: Request, res: Response) => {
+  const { projectId } = req.params;
 
-//     sendResponse(res, {
-//       statusCode: result ? 200 : 400,
-//       success: result ? true : false,
-//       message: result ? "Here is project votes" : "Project not found",
-//       data: result,
-//     });
-//   } catch (error) {
-//     console.log(error);
+  const getLikes = await VoteService.getAllVoteByPost(projectId);
 
-//     sendResponse(res, {
-//       statusCode: 500,
-//       success: false,
-//       message: "An error occurred",
-//       data: null,
-//     });
-//   }
-// });
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "retrieved successfully",
+    data: getLikes,
+  });
+});
 
-// const getVotebyUser = catchAsync(async (req: Request, res: Response) => {
-//   try {
-//     const token = req.headers.authorization;
-//     if (!token) {
-//       throw new ApiError(httpStatus.BAD_REQUEST, "Sorry");
-//     }
-//     const result = await voteService.getVotebyUser(token);
+const getAllVoteByUser = catchAsync(async (req: Request, res: Response) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Sorry");
+  }
 
-//     sendResponse(res, {
-//       statusCode: result ? 200 : 400,
-//       success: result ? true : false,
-//       message: result ? "Here is project votes" : "Project not found",
-//       data: result,
-//     });
-//   } catch (error) {
-//     console.log(error);
+  const getLikes = await VoteService.getAllVoteByUser(token);
 
-//     sendResponse(res, {
-//       statusCode: 500,
-//       success: false,
-//       message: "An error occurred",
-//       data: null,
-//     });
-//   }
-// });
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "retrieved successfully",
+    data: getLikes,
+  });
+});
 
-// export const voteController = {
-//   createOrRemoveVote,
-//   getVotebyProject,
-//   getVotebyUser,
-// };
+// project like operation
+const projectVoteOperation = catchAsync(async (req: Request, res: Response) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "UNAUTHORIZED");
+  }
+
+  const operationData = req.body;
+
+  const result = await VoteService.createOrRemoveVote(token, operationData);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Operation successfully",
+    data: result,
+  });
+});
+
+export const VoteController = {
+  createOrRemoveVote,
+  getAllVoteByPost,
+  getAllVoteByUser,
+  projectVoteOperation,
+};

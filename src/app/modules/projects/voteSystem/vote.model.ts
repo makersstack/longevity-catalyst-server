@@ -4,9 +4,9 @@ import { User } from "../../user/user.model";
 import { Project } from "../project.model";
 
 // Define the Category model
-class ProjectLike extends Model {}
+class ProjectVote extends Model {}
 
-ProjectLike.init(
+ProjectVote.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -29,11 +29,15 @@ ProjectLike.init(
         key: "id",
       },
     },
+    voteType: {
+      type: DataTypes.ENUM("up", "down"),
+      allowNull: false,
+    },
   },
   {
     sequelize,
-    modelName: "ProjectLike",
-    tableName: "project_likes",
+    modelName: "ProjectVote",
+    tableName: "project_vote",
     timestamps: true, // If you don't want timestamps in your table
   }
 );
@@ -44,7 +48,7 @@ sequelize
     console.error("Error creating Project table:", err);
   });
 
-ProjectLike.belongsTo(Project, { foreignKey: "project_id" });
+ProjectVote.belongsTo(Project, { foreignKey: "project_id" });
 Project.belongsTo(User, { foreignKey: "authorId" });
 
-export { ProjectLike };
+export { ProjectVote };

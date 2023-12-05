@@ -8,6 +8,39 @@ class Project extends Model {
   static async findProjectById(id: number) {
     return Project.findByPk(id);
   }
+
+  static async findAllWithUserLikesVote(id: number, options: any) {
+    const projects = await Project.findAll({
+      ...options, // Spread the options object
+      attributes: {
+        include: [
+          [
+            sequelize.literal(`(
+              SELECT COUNT(*) 
+              FROM project_likes AS user_like 
+              WHERE user_like.project_id = Project.id 
+              AND user_like.authorId = ${id}
+            )`),
+            "isLikedByUser",
+          ],
+          [
+            sequelize.literal(`(
+              SELECT voteType 
+              FROM project_vote AS user_vote 
+              WHERE user_vote.project_id = Project.id 
+              AND user_vote.authorId = ${id}
+            )`),
+            "VoteByUser",
+          ],
+        ],
+      },
+    });
+    const count = await Project.count({
+      ...options,
+    });
+
+    return { count, projects };
+  }
 }
 
 Project.init(
@@ -147,14 +180,6 @@ Project.init(
     },
     other_included: {
       type: DataTypes.TEXT("long"),
-    },
-    upVoteCount: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-    },
-    downVoteCount: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
     },
     createdAt: {
       type: DataTypes.DATE,

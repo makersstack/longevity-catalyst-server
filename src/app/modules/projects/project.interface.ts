@@ -68,8 +68,6 @@ export interface ProjectData {
   relevant_link?: string;
   relevant_literature_link?: string;
   other_included?: string;
-  upVoteCount?: number;
-  downVoteCount?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -107,8 +105,6 @@ export type IApiResponseProjectData = {
   relevant_link?: string;
   relevant_literature_link?: string;
   other_included?: string;
-  upVoteCount?: number;
-  downVoteCount?: number;
   createdAt?: string;
   updatedAt?: string;
 };
