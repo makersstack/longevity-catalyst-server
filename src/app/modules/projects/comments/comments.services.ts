@@ -5,6 +5,7 @@ import { paginationHelpers } from "../../../../helpers/paginationHelpers";
 import { utilities } from "../../../../helpers/utilities";
 import { User } from "../../user/user.model";
 import { Project } from "../project.model";
+import Reply from "../reply/reply.model";
 import Comment from "./comments.model";
 
 const createComment = async (
@@ -116,7 +117,25 @@ const getAllCommentByProject = async (
         model: User,
         attributes: ["id", "full_name", "username", "email", "profileImage"],
       },
+      {
+        model: Reply,
+        attributes: ["id", "commentId", "replyText"],
+        include: [
+          {
+            model: User,
+            attributes: [
+              "id",
+              "full_name",
+              "username",
+              "email",
+              "profileImage",
+            ],
+          },
+        ],
+      },
     ],
+    distinct: true,
+    subQuery: false,
   };
   if (sortBy && sortOrder) {
     options.order.push([sortBy, sortOrder]);

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
+import httpStatus from "http-status";
 import config from "../../config";
 import ApiError from "../../errors/ApiError";
 import handaleCastError from "../../errors/handaleCastError";
@@ -38,12 +39,12 @@ const globalErrorHandler: ErrorRequestHandler = (
       : [];
   } else if (error instanceof Error) {
     if (error.name === "TokenExpiredError") {
-      statusCode = 401;
+      statusCode = httpStatus.UNAUTHORIZED;
       message = "Forbidden - Token Expired";
       errorMessages = [
         {
           path: "JWT",
-          message: "Token has expired.",
+          message: "Token has expired. Please refresh your token.",
         },
       ];
     } else {
