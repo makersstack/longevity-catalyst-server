@@ -13,22 +13,11 @@ router.post(
     ENUM_USER_ROLE.REGULARUSER,
     ENUM_USER_ROLE.CONTRIBUTOR,
     ENUM_USER_ROLE.RESEARCHER,
-    ENUM_USER_ROLE.REGULARUSER,
     ENUM_USER_ROLE.ADMIN
   ),
   commentController.createComment
 );
-router.get(
-  "/:projectId/comments",
-  auth(
-    ENUM_USER_ROLE.REGULARUSER,
-    ENUM_USER_ROLE.RESEARCHER,
-    ENUM_USER_ROLE.CONTRIBUTOR,
-    ENUM_USER_ROLE.ADMIN
-  ),
-  // TODO NEED WORK
-  commentController.getAllCommentByProject
-);
+router.get("/:projectId/comments", commentController.getAllCommentByProject);
 router.delete(
   "/comment/:commentId",
   auth(
@@ -49,12 +38,12 @@ router.patch(
   ),
   commentController.updateComment
 );
+
 // For Reply
 router.post(
   "/:projectId/comment/:commentId/reply",
   replyController.createReply
 );
-router.get("/:id", replyController.getSingleReply);
 router.delete("/:id", replyController.deleteReply);
 router.patch("/:id", replyController.updateReply);
 

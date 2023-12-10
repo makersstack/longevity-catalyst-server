@@ -8,13 +8,12 @@ import sendResponse from "../../../../shared/sendResponse";
 import { commentService } from "./comments.services";
 
 const createComment = catchAsync(async (req: Request, res: Response) => {
-  const projectId = Number(req.params.projectId);
-  const { commentText } = req.body;
   const token = req.headers.authorization;
-
   if (!token) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "You are not authorized");
   }
+  const projectId = Number(req.params.projectId);
+  const { commentText } = req.body;
 
   const result = await commentService.createComment(
     token,
@@ -75,11 +74,6 @@ const getAllCommentByProject = catchAsync(
   async (req: Request, res: Response) => {
     const paginationOptions = pick(req.query, paginationFileds);
     const projectId = Number(req.params.projectId);
-    const token = req.headers.authorization;
-
-    if (!token) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorize");
-    }
 
     const comments = await commentService.getAllCommentByProject(
       projectId,

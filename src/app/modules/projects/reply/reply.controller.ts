@@ -1,17 +1,15 @@
 import { Request, Response } from "express";
 import httpStatus from "http-status";
-import { paginationFileds } from "../../../../constants/pagination";
 import ApiError from "../../../../errors/ApiError";
 import catchAsync from "../../../../shared/catchAsync";
-import pick from "../../../../shared/pick";
 import sendResponse from "../../../../shared/sendResponse";
 import { replyService } from "./reply.services";
 
 const createReply = catchAsync(async (req: Request, res: Response) => {
   const token = req.headers.authorization;
-  const replyText = req.body;
   const projectId = Number(req.params.projectId);
   const commentId = Number(req.params.commentId);
+  const { replyText } = req.body;
 
   if (!token || !replyText || !projectId || !commentId) {
     throw new ApiError(httpStatus.NOT_ACCEPTABLE, "Something is missing");
@@ -19,9 +17,9 @@ const createReply = catchAsync(async (req: Request, res: Response) => {
 
   const replyResult = await replyService.createReply(
     token,
-    replyText,
     projectId,
-    commentId
+    commentId,
+    replyText
   );
 
   sendResponse(res, {
@@ -77,49 +75,29 @@ const deleteReply = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getSingleReply = catchAsync(async (req: Request, res: Response) => {
-  try {
-    const replyId = req.params.id;
-    const project = await replyService.getSingleProject(replyId);
-    if (project) {
-      res.status(200).json(project);
-    } else {
-      res.status(404).json({ error: "Project not found" });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-const getAllReplysByComment = catchAsync(
-  async (req: Request, res: Response) => {
-    const token = req.headers.authorization;
-    const paginationOptions = pick(req.query, paginationFileds);
-    const projectId = Number(req.params.projectId);
-    const commentId = Number(req.params.commentId);
+// const getAllReplysByComment = catchAsync(
+//   async (req: Request, res: Response) => {
+//     const paginationOptions = pick(req.query, paginationFileds);
+//     const projectId = Number(req.params.projectId);
+//     const commentId = Number(req.params.commentId);
 
-    if (!token) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorize");
-    }
+//     const replys = await replyService.getAllReplyByComment(
+//       projectId,
+//       commentId,
+//       paginationOptions
+//     );
 
-    const replys = await replyService.getAllReplyByComment(
-      projectId,
-      commentId,
-      paginationOptions
-    );
-
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "Comments Rettrif successfylly",
-      data: replys,
-    });
-  }
-);
+//     sendResponse(res, {
+//       statusCode: httpStatus.OK,
+//       success: true,
+//       message: "Comments Rettrif successfylly",
+//       data: replys,
+//     });
+//   }
+// );
 export const replyController = {
   createReply,
   updateReply,
   deleteReply,
-  getSingleReply,
-  getAllReplysByComment,
+  // getAllReplysByComment,
 };

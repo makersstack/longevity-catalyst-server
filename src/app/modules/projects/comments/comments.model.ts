@@ -2,6 +2,7 @@ import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../../config/sequelize-config";
 import { User } from "../../user/user.model";
 import { Project } from "../project.model";
+import Reply from "../reply/reply.model";
 
 class Comment extends Model {
   public id!: number;
@@ -58,5 +59,6 @@ Comment.init(
 
 Comment.belongsTo(User, { foreignKey: "userId" });
 Comment.belongsTo(Project, { foreignKey: "projectId" });
+Comment.hasMany(Reply, { foreignKey: "commentId" });
 
 export default Comment;
