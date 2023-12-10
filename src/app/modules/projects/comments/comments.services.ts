@@ -119,7 +119,7 @@ const getAllCommentByProject = async (
       },
       {
         model: Reply,
-        attributes: ["id", "commentId", "replyText"],
+        attributes: ["id", "commentId", "replyText", "createdAt"],
         include: [
           {
             model: User,
