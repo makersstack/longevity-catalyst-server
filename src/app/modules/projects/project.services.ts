@@ -226,6 +226,7 @@ const getAllProjects = async (
 };
 
 const getAllProjectsByUsername = async (
+  userToken: string | null,
   filters: IProjectFilters,
   paginationOptions: IPaginationOptons,
   username: string
@@ -278,10 +279,81 @@ const getAllProjectsByUsername = async (
   if (sortBy && sortOrder) {
     options.order.push([sortBy, sortOrder]);
   }
+  let result: any;
+  let total: any;
+  // for user liked and vote check
+  if (userToken !== null) {
+    const userInfo = (await utilities.tokenToUserInfo(userToken)) as any;
+    const { projects, count } = await Project.findAllWithUserLikesVote(
+      userInfo.id,
+      options
+    );
+    result = projects;
+    total = count;
+  } else {
+    const projects = await Project.findAndCountAll(options);
+    result = projects.rows;
+    total = result.count;
+  }
 
-  const result = await Project.findAndCountAll(options);
+  result = await Promise.all(
+    result.map(async (project: any) => {
+      const projectId = project.id; // Assuming 'id' is the project's ID field
 
-  const total = result.count;
+      // Fetch authorId for this project from ProjectLike
+      const projectLikeData = await ProjectLike.findAll({
+        where: {
+          project_id: projectId, // Filter by the project ID
+        },
+        order: [["createdAt", "DESC"]], // Order by createdAt in descending order
+        attributes: ["authorId"], // Select only authorId
+      });
+
+      // Extract the authorIds
+      const authorIds = projectLikeData.map((like: any) => like.authorId);
+
+      // Fetch user details for authorIds from the User model
+      const authors = await User.findAll({
+        where: {
+          id: authorIds, // Filter by the extracted authorIds
+        },
+        attributes: ["username", "profileImage"], // Define the attributes you want to retrieve
+      });
+
+      // Get the total like count for the project
+      const totalLikes = await ProjectLike.count({
+        where: {
+          project_id: projectId,
+        },
+      });
+      // project vote counting
+      const upVote = await ProjectVote.count({
+        where: {
+          voteType: "up",
+          project_id: projectId,
+        },
+      });
+      const downVote = await ProjectVote.count({
+        where: {
+          voteType: "down",
+          project_id: projectId,
+        },
+      });
+      const voteCounts = {
+        total: upVote + downVote,
+        up: upVote,
+        down: downVote,
+      };
+
+      // Add the authors details and total like count to the project data
+      return {
+        ...project.toJSON(), // Convert the project to a plain object
+        likedUsers: authors, // Add the authors details as likedUsers
+        totalLikes, // Add the total like count for the project
+        voteCounts: voteCounts,
+      };
+    })
+  );
 
   const responseData: IGenericResponse<Project[]> = {
     meta: {
@@ -289,16 +361,12 @@ const getAllProjectsByUsername = async (
       limit,
       total,
     },
-    data: result.rows,
+    data: result,
   };
   return responseData;
 };
 
-const getSingleProject = async (token: string, projectId: number) => {
-  const getUserInfo = utilities.tokenToUserInfo(token);
-  if (!getUserInfo) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
-  }
+const getSingleProject = async (projectId: number) => {
   const project = await Project.findByPk(projectId, {
     include: [
       {
