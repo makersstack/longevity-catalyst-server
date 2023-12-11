@@ -164,7 +164,7 @@ const getAllProjectsByUsername = catchAsync(
 );
 
 const getSingleProject = catchAsync(async (req: Request, res: Response) => {
-  const token = req.headers.authorization;
+  // const token = req.headers.authorization;
   const projectId = Number(req.params.id);
 
   // if (!token) {
