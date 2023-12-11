@@ -6,7 +6,7 @@ import { errorlogger, logger } from "./shared/logger";
 
 let server: Server;
 
-async function main() {
+async function startServer() {
   try {
     await sequelize.sync();
     server = createServer(app);
@@ -17,24 +17,19 @@ async function main() {
   } catch (error) {
     errorlogger.error(`Failed to connect database`, error);
   }
-
-  process.on("unhandledRejection", (error) => {
-    if (server) {
-      server.close(() => {
-        errorlogger.error(error);
-        process.exit(1);
-      });
-    } else {
-      process.exit(1);
-    }
-  });
 }
+startServer();
 
-main();
+process.on("unhandledRejection", (error) => {
+  errorlogger.error(`Unhandled Rejection: ${error}`);
+});
 
 process.on("SIGABRT", () => {
-  console.log("SIGTERM is Received");
+  console.log("SIGABRT is Received");
   if (server) {
-    server.close();
+    server.close(() => {
+      logger.info("Server is gracefully closed");
+      process.exit(1);
+    });
   }
 });

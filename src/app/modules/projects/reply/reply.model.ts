@@ -47,7 +47,7 @@ Reply.init(
     },
     replyText: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: false,
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -65,6 +65,6 @@ Reply.init(
 
 Reply.belongsTo(User, { foreignKey: "userId" });
 Reply.belongsTo(Project, { foreignKey: "projectId" });
-Reply.belongsTo(Comment, { foreignKey: "commentId" });
+// Reply.belongsTo(Comment, { foreignKey: "commentId" });
 
 export default Reply;

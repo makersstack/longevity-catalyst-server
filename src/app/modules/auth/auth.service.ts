@@ -72,7 +72,7 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
       config.jwt.refresh_secret as Secret
     );
   } catch (err) {
-    throw new ApiError(httpStatus.FORBIDDEN, "Invalid Refresh Token");
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Invalid Refresh Token");
   }
 
   const { userId } = verifiedToken;
