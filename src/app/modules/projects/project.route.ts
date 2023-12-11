@@ -14,7 +14,7 @@ router.get("/user/:username", projectController.getAllProjectsByUsername);
 
 router.post("/create", projectController.createProject);
 router.delete(
-  "/:id",
+  "/:id/delete",
   auth(
     ENUM_USER_ROLE.REGULARUSER,
     ENUM_USER_ROLE.CONTRIBUTOR,
@@ -23,12 +23,12 @@ router.delete(
   projectController.deleteProject
 );
 router.patch(
-  "/:id",
-  auth(
-    ENUM_USER_ROLE.REGULARUSER,
-    ENUM_USER_ROLE.CONTRIBUTOR,
-    ENUM_USER_ROLE.ADMIN
-  ),
+  "/:id/update",
+  // auth(
+  //   ENUM_USER_ROLE.REGULARUSER,
+  //   ENUM_USER_ROLE.CONTRIBUTOR,
+  //   ENUM_USER_ROLE.ADMIN
+  // ),
   projectController.updateProject
 );
 

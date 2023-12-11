@@ -41,6 +41,7 @@ const updateProject = catchAsync(async (req: Request, res: Response) => {
   const projectId = req.params.id;
   const projectData = req.body;
   const token = req.headers.authorization;
+
   if (!token) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
@@ -137,8 +138,16 @@ const getAllProjectsByUsername = catchAsync(
     if (!username) {
       throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
     }
+    let userToken;
+
+    if (!token) {
+      userToken = null;
+    } else {
+      userToken = token;
+    }
 
     const result = await ProjectService.getAllProjectsByUsername(
+      userToken,
       filters,
       paginationOptions,
       username
@@ -158,9 +167,9 @@ const getSingleProject = catchAsync(async (req: Request, res: Response) => {
   const token = req.headers.authorization;
   const projectId = Number(req.params.id);
 
-  if (!token) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
-  }
+  // if (!token) {
+  //   throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+  // }
 
   // const isAuthorized = utilities.verifiedTokenAndDb(token);
   // if (!isAuthorized) {
@@ -170,7 +179,7 @@ const getSingleProject = catchAsync(async (req: Request, res: Response) => {
   //   );
   // }
 
-  const project = await ProjectService.getSingleProject(token, projectId);
+  const project = await ProjectService.getSingleProject(projectId);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
