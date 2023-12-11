@@ -41,7 +41,7 @@ const updateProject = catchAsync(async (req: Request, res: Response) => {
   const projectId = req.params.id;
   const projectData = req.body;
   const token = req.headers.authorization;
-  console.log(projectId);
+
   if (!token) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
