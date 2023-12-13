@@ -107,7 +107,6 @@ const getAllProjects = catchAsync(
     } else {
       userToken = token;
     }
-
     // const isAuthorized = utilities.verifiedTokenAndDb(token);
     // if (!isAuthorized) {
     //   throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");

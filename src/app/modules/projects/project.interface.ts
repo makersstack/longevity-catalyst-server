@@ -74,6 +74,7 @@ export interface ProjectData {
 
 export type IProjectFilters = {
   searchTerm?: string;
+  selectedCategory?: number;
 };
 
 export type IApiResponseProjectData = {
