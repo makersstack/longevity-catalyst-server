@@ -86,7 +86,7 @@ const getAllProjects = async (
   paginationOptions: IPaginationOptons
 ) => {
   // For Search
-  const { searchTerm, ...filtersData } = filters;
+  const { searchTerm, selectedCategory, ...filtersData } = filters;
 
   const andCondition = [];
 
@@ -100,6 +100,12 @@ const getAllProjects = async (
     });
   }
 
+  if (selectedCategory) {
+    andCondition.push({
+      primary_category: selectedCategory, // Assuming 'categoryId' is the field to match against
+    });
+  }
+  // console.log(selectedCategory);
   // For Filter
   if (Object.keys(filtersData).length) {
     andCondition.push({

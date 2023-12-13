@@ -3,6 +3,7 @@ export const projectFilterableFields = [
   "project_name",
   "project_desc",
   "id",
+  "selectedCategory",
   "upVoteCount",
   "downVoteCount",
 ];
