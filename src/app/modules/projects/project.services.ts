@@ -86,7 +86,16 @@ const getAllProjects = async (
   paginationOptions: IPaginationOptons
 ) => {
   // For Search
-  const { searchTerm, selectedCategory, ...filtersData } = filters;
+  const {
+    searchTerm,
+    selectedCategory,
+    selectedDuration,
+    selectedRequiredSkills,
+    selectedTopic,
+    selectedFundingStatus,
+    selectedLanguage,
+    ...filtersData
+  } = filters;
 
   const andCondition = [];
 
@@ -98,6 +107,50 @@ const getAllProjects = async (
         },
       })),
     });
+  }
+
+  if (selectedDuration) {
+    andCondition.push({
+      [Op.or]: projectSearchableFields.map((field) => ({
+        [field]: {
+          [Op.like]: `%${selectedDuration}%`,
+        },
+      })),
+    });
+  }
+
+  if (selectedTopic) {
+    andCondition.push({
+      [Op.or]: projectSearchableFields.map((field) => ({
+        [field]: {
+          [Op.like]: `%${selectedTopic}%`,
+        },
+      })),
+    });
+  }
+
+  if (selectedFundingStatus) {
+    andCondition.push({
+      [Op.or]: projectSearchableFields.map((field) => ({
+        [field]: {
+          [Op.like]: `%${selectedFundingStatus}%`,
+        },
+      })),
+    });
+  }
+
+  if (selectedLanguage) {
+    andCondition.push({
+      [Op.or]: projectSearchableFields.map((field) => ({
+        [field]: {
+          [Op.like]: `%${selectedLanguage}%`,
+        },
+      })),
+    });
+  }
+
+  if (selectedRequiredSkills) {
+    return;
   }
 
   if (selectedCategory) {

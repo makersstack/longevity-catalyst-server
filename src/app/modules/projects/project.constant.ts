@@ -4,6 +4,11 @@ export const projectFilterableFields = [
   "project_desc",
   "id",
   "selectedCategory",
+  "selectedDuration",
+  "selectedRequiredSkills",
+  "selectedTopic",
+  "selectedFundingStatus",
+  "selectedLanguage",
   "upVoteCount",
   "downVoteCount",
 ];
@@ -12,5 +17,9 @@ export const projectSearchableFields = [
   "project_name",
   "project_desc",
   "primary_category",
+  "expectedTimeProject",
+  "projecType",
+  "projectExperience",
+  "readyToStart",
   "id",
 ];

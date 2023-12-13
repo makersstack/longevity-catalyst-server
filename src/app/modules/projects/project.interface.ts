@@ -75,6 +75,11 @@ export interface ProjectData {
 export type IProjectFilters = {
   searchTerm?: string;
   selectedCategory?: number;
+  selectedDuration?: string;
+  selectedRequiredSkills?: unknown[];
+  selectedTopic?: string;
+  selectedFundingStatus?: string;
+  selectedLanguage?: string;
 };
 
 export type IApiResponseProjectData = {
