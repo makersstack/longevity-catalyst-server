@@ -91,8 +91,39 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const logoutUser = catchAsync(async (req: Request, res: Response) => {
+  // Get the refresh token from the request cookies
+  const { refreshToken } = req.cookies;
+
+  // If the refresh token doesn't exist or is invalid, respond with an error or appropriate status
+  if (!refreshToken) {
+    return sendResponse(res, {
+      statusCode: httpStatus.UNAUTHORIZED,
+      success: false,
+      message: "User is not logged in",
+    });
+  }
+
+  // Invalidate or revoke the refresh token (e.g., delete it from the database or set it as invalid)
+
+  // Clear the refresh token cookie by setting an expired date
+  res.cookie("refreshToken", "", {
+    httpOnly: true,
+    expires: new Date(0),
+    secure: config.env === "development",
+    path: "/",
+  });
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User logged out successfully!",
+  });
+});
+
 export const AuthController = {
   loginUser,
+  logoutUser,
   refreshToken,
   changePassword,
 };
