@@ -86,13 +86,20 @@ const deleteComment = async (token: string, commentId: number) => {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized");
   }
 
-  const result = await Comment.findOne({ where: { id: commentId } });
-
-  if (result) {
-    await result.destroy();
-    return result;
+  const comment = await Comment.findOne({ where: { id: commentId } });
+  if (!comment) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Comment not found");
   }
-  return null;
+
+  if (comment.userId !== userId) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "Forbidden: You do not have permission to delete this comment"
+    );
+  }
+
+  await comment.destroy();
+  return comment;
 };
 
 const getAllCommentByProject = async (
