@@ -299,7 +299,16 @@ const getAllProjectsByUsername = async (
   }
   const { id } = user.toJSON();
   // For Search
-  const { searchTerm, ...filtersData } = filters;
+  const {
+    searchTerm,
+    selectedCategory,
+    selectedDuration,
+    selectedRequiredSkills,
+    selectedTopic,
+    selectedFundingStatus,
+    selectedLanguage,
+    ...filtersData
+  } = filters;
   const andCondition = [];
   if (searchTerm) {
     andCondition.push({
@@ -308,6 +317,56 @@ const getAllProjectsByUsername = async (
           [Op.like]: `%${searchTerm.toLowerCase()}%`,
         },
       })),
+    });
+  }
+
+  if (selectedDuration) {
+    andCondition.push({
+      [Op.or]: projectSearchableFields.map((field) => ({
+        [field]: {
+          [Op.like]: `%${selectedDuration}%`,
+        },
+      })),
+    });
+  }
+
+  if (selectedTopic) {
+    andCondition.push({
+      [Op.or]: projectSearchableFields.map((field) => ({
+        [field]: {
+          [Op.like]: `%${selectedTopic}%`,
+        },
+      })),
+    });
+  }
+
+  if (selectedFundingStatus) {
+    andCondition.push({
+      [Op.or]: projectSearchableFields.map((field) => ({
+        [field]: {
+          [Op.like]: `%${selectedFundingStatus}%`,
+        },
+      })),
+    });
+  }
+
+  if (selectedLanguage) {
+    andCondition.push({
+      [Op.or]: projectSearchableFields.map((field) => ({
+        [field]: {
+          [Op.like]: `%${selectedLanguage}%`,
+        },
+      })),
+    });
+  }
+
+  if (selectedRequiredSkills) {
+    return;
+  }
+
+  if (selectedCategory) {
+    andCondition.push({
+      primary_category: selectedCategory, // Assuming 'categoryId' is the field to match against
     });
   }
 
