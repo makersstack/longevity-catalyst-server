@@ -25,16 +25,11 @@ const auth =
         throw new ApiError(httpStatus.UNAUTHORIZED, "You are not authorized");
       }
 
-      console.log("Required Roles:", requiredRoles);
-      console.log("Verified User Role:", verifiedUser.userRole);
       // Role-based authorization
-      if (
-        requiredRoles.length &&
-        !requiredRoles.includes(verifiedUser.userRole)
-      ) {
+      if (requiredRoles.length && !requiredRoles.includes(verifiedUser.role)) {
         throw new ApiError(
           httpStatus.UNAUTHORIZED,
-          "Forbidden: You do not have permission to delete this comment"
+          "Forbidden: You are not authorized"
         );
       }
 
