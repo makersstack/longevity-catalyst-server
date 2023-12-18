@@ -12,7 +12,7 @@ const createComment = async (
   token: string,
   projectId: number,
   commentText: string
-): Promise<Comment | null> => {
+) => {
   if (!token || !commentText || !projectId) {
     throw new ApiError(httpStatus.NOT_ACCEPTABLE, "Invalid input data");
   }
@@ -26,15 +26,28 @@ const createComment = async (
   if (!checkProject) {
     throw new ApiError(httpStatus.NOT_FOUND, "Project not found");
   }
-
+  console.log(projectId);
   const createdComment = await Comment.create({
     userId,
-    projectId,
     commentText,
-    createdAt: new Date(),
+    projectId,
   });
 
-  return createdComment.toJSON() as Comment;
+  const user = await User.findByPk(userId, {
+    attributes: ["id", "full_name", "username", "email", "profileImage"],
+  });
+
+  // Append user data to the comment object
+  const commentWithUserData = {
+    ...createdComment.toJSON(),
+    User: user,
+  };
+
+  return commentWithUserData as Comment;
+
+  // Handle if comment or user doesn't exist or if there's an error
+
+  // return createdComment.toJSON() as Comment;
 };
 
 const updateComment = async (

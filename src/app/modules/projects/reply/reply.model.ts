@@ -63,8 +63,10 @@ Reply.init(
   }
 );
 
-Reply.belongsTo(User, { foreignKey: "userId" });
+Reply.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
 Reply.belongsTo(Project, { foreignKey: "projectId" });
-// Reply.belongsTo(Comment, { foreignKey: "commentId" });
+Reply.belongsTo(Comment, { foreignKey: "commentId", onDelete: "CASCADE" }); // Associating Reply with Comment
+Comment.hasMany(Reply, { foreignKey: "commentId" }); // Associating Comment with Reply
+User.hasMany(Reply, { foreignKey: "userId", onDelete: "CASCADE" });
 
 export default Reply;

@@ -2,8 +2,7 @@
 import httpStatus from "http-status";
 import ApiError from "../../../../errors/ApiError";
 import { utilities } from "../../../../helpers/utilities";
-import Comment from "../comments/comments.model";
-import { Project } from "../project.model";
+import { User } from "../../user/user.model";
 import Reply from "./reply.model";
 
 const createReply = async (
@@ -19,15 +18,15 @@ const createReply = async (
   if (!userId) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized");
   }
-  const checkProject = await Project.findByPk(projectId);
-  const checkComment = await Comment.findByPk(projectId);
+  // const checkProject = await Project.findByPk(projectId);
+  // const checkComment = await Comment.findByPk(projectId);
 
-  if (!checkProject || !checkComment) {
-    throw new ApiError(
-      httpStatus.NOT_FOUND,
-      "Comment && project are not found"
-    );
-  }
+  // if (!checkProject || !checkComment) {
+  //   throw new ApiError(
+  //     httpStatus.NOT_FOUND,
+  //     "Comment && project are not found"
+  //   );
+  // }
   const createReply = await Reply.create({
     userId,
     projectId,
@@ -36,7 +35,17 @@ const createReply = async (
     createdAt: new Date(),
   });
 
-  return createReply.toJSON() as Reply;
+  const user = await User.findByPk(userId, {
+    attributes: ["id", "full_name", "username", "email", "profileImage"],
+  });
+
+  // Append user data to the comment object
+  const replyWithUserData = {
+    ...createReply.toJSON(),
+    User: user,
+  };
+
+  return replyWithUserData as Reply;
 };
 
 const updateReply = async (
@@ -85,14 +94,22 @@ const deleteReply = async (token: string, replyId: number) => {
   if (!userId) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized");
   }
-  const result = await Comment.findOne({ where: { id: replyId } });
+  const replay = await Reply.findOne({ where: { id: replyId } });
 
-  if (result) {
-    await result.destroy();
-    return result;
+  if (!replay) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Reply not found");
   }
 
-  return null;
+  if (replay.userId !== userId) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "Forbidden: You do not have permission to delete this replay"
+    );
+  }
+
+  await replay.destroy();
+
+  return replay;
 };
 
 const getSingleProject = async (projectId: string) => {
