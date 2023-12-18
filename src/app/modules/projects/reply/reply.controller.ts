@@ -64,6 +64,9 @@ const deleteReply = catchAsync(async (req: Request, res: Response) => {
   if (!token || !replyId) {
     throw new ApiError(httpStatus.NOT_ACCEPTABLE, "Not found creadiential");
   }
+  if (!token) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "You are unauthorized");
+  }
 
   const deleteReplyResult = await replyService.deleteReply(token, replyId);
 

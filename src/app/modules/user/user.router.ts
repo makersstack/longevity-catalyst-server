@@ -8,5 +8,6 @@ router.get("/", UserController.getAllUsers);
 router.get("/:username", UserController.getUserByUserName);
 router.get("/profile/:id", UserController.getUserInfoById);
 router.patch("/:username", UserController.updateUser);
+router.delete("/:id/delete", UserController.deleteUser);
 
 export const UserRoutes = router;

@@ -106,10 +106,27 @@ const getUserInfoById = async (userId: number): Promise<IUser | null> => {
   const result = findUser.toJSON() as IUser;
   return result;
 };
+
+const deleteUser = async (userId: number): Promise<IUser | null> => {
+  if (!userId) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  const findUser = await User.findByPk(userId);
+
+  if (!findUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  await findUser.destroy();
+
+  return findUser.toJSON() as IUser;
+};
 export const userService = {
   createUser,
   updateUser,
   getAllUsers,
   getUserInfoById,
   getUserByUserName,
+  deleteUser,
 };

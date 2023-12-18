@@ -16,18 +16,10 @@ ProjectVote.init(
     authorId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: User,
-        key: "id",
-      },
     },
     project_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: Project,
-        key: "id",
-      },
     },
     voteType: {
       type: DataTypes.ENUM("up", "down"),
@@ -48,7 +40,12 @@ sequelize
     console.error("Error creating Project table:", err);
   });
 
-ProjectVote.belongsTo(Project, { foreignKey: "project_id" });
-Project.belongsTo(User, { foreignKey: "authorId" });
+ProjectVote.belongsTo(Project, {
+  foreignKey: "project_id",
+  onDelete: "CASCADE",
+});
+ProjectVote.belongsTo(User, { foreignKey: "authorId", onDelete: "CASCADE" });
+User.hasMany(ProjectVote, { foreignKey: "authorId", onDelete: "CASCADE" });
+Project.hasMany(ProjectVote, { foreignKey: "project_id", onDelete: "CASCADE" });
 
 export { ProjectVote };

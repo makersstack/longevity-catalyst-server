@@ -16,18 +16,10 @@ ProjectLike.init(
     authorId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: User,
-        key: "id",
-      },
     },
     project_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: Project,
-        key: "id",
-      },
     },
   },
   {
@@ -44,7 +36,12 @@ sequelize
     console.error("Error creating Project table:", err);
   });
 
-ProjectLike.belongsTo(Project, { foreignKey: "project_id" });
-Project.belongsTo(User, { foreignKey: "authorId" });
+ProjectLike.belongsTo(Project, {
+  foreignKey: "project_id",
+  onDelete: "CASCADE",
+});
+ProjectLike.belongsTo(User, { foreignKey: "authorId", onDelete: "CASCADE" });
+User.hasMany(ProjectLike, { foreignKey: "authorId", onDelete: "CASCADE" });
+Project.hasMany(ProjectLike, { foreignKey: "project_id", onDelete: "CASCADE" });
 
 export { ProjectLike };

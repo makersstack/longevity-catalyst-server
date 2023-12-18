@@ -2,7 +2,6 @@ import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../../config/sequelize-config";
 import { User } from "../../user/user.model";
 import { Project } from "../project.model";
-import Reply from "../reply/reply.model";
 
 class Comment extends Model {
   public id!: number;
@@ -32,10 +31,7 @@ Comment.init(
     projectId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: Project,
-        key: "id",
-      },
+      /* You can omit the references here if you are manually managing the foreign key */
     },
     commentText: {
       type: DataTypes.TEXT,
@@ -57,8 +53,10 @@ Comment.init(
   }
 );
 
-Comment.belongsTo(User, { foreignKey: "userId" });
-Comment.belongsTo(Project, { foreignKey: "projectId" });
-Comment.hasMany(Reply, { foreignKey: "commentId" });
+Comment.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
+Comment.belongsTo(Project, { foreignKey: "projectId", onDelete: "CASCADE" });
+// Establishing the hasMany relationship
+Project.hasMany(Comment, { foreignKey: "projectId", onDelete: "CASCADE" }); // A project can have many comments
+User.hasMany(Comment, { foreignKey: "userId", onDelete: "CASCADE" });
 
 export default Comment;

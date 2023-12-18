@@ -55,10 +55,6 @@ Project.init(
     authorId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: User,
-        key: "id",
-      },
     },
     project_name: {
       type: DataTypes.STRING,
@@ -204,7 +200,7 @@ sequelize
     console.error("Error creating Project table:", err);
   });
 
-Project.belongsTo(User, { foreignKey: "authorId" });
+Project.belongsTo(User, { foreignKey: "authorId", onDelete: "CASCADE" });
 Project.belongsTo(Categories, { foreignKey: "primary_category" });
-
+User.hasMany(Project, { foreignKey: "authorId", onDelete: "CASCADE" });
 export { Project };

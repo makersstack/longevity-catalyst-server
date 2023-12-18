@@ -16,10 +16,6 @@ ProjectCategory.init(
     category_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: Categories,
-        key: "id",
-      },
     },
     project_id: {
       type: DataTypes.INTEGER,
@@ -44,7 +40,14 @@ sequelize
     console.error("Error creating Project table:", err);
   });
 
-ProjectCategory.belongsTo(Project, { foreignKey: "project_id" });
+ProjectCategory.belongsTo(Project, {
+  foreignKey: "project_id",
+  onDelete: "CASCADE",
+});
 ProjectCategory.belongsTo(Categories, { foreignKey: "category_id" });
+Project.hasMany(ProjectCategory, {
+  foreignKey: "project_id",
+  onDelete: "CASCADE",
+});
 
 export { ProjectCategory };

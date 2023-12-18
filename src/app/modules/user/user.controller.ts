@@ -153,10 +153,30 @@ const getUserInfoById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const deleteUser = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.id;
+
+  if (!userId) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  const convertId = Number(userId);
+
+  const result = await userService.deleteUser(convertId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User retrif successful",
+    data: result,
+  });
+});
+
 export const UserController = {
   createUser,
   updateUser,
   getAllUsers,
   getUserByUserName,
   getUserInfoById,
+  deleteUser,
 };

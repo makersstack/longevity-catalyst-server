@@ -19,7 +19,7 @@ router.post(
 );
 router.get("/:projectId/comments", commentController.getAllCommentByProject);
 router.delete(
-  "/comment/:commentId",
+  "/comment/delete/:commentId",
   auth(
     ENUM_USER_ROLE.REGULARUSER,
     ENUM_USER_ROLE.CONTRIBUTOR,
@@ -44,7 +44,7 @@ router.post(
   "/:projectId/comment/:commentId/reply",
   replyController.createReply
 );
-router.delete("/:id", replyController.deleteReply);
+router.delete("/replay/delete/:replyId", replyController.deleteReply);
 router.patch("/:id", replyController.updateReply);
 
 export const commentRoute = router;
