@@ -29,7 +29,7 @@ router.delete(
   commentController.deleteComment
 );
 router.patch(
-  "/:projectId/comment/:commentId",
+  "/comment/:commentId/update",
   auth(
     ENUM_USER_ROLE.REGULARUSER,
     ENUM_USER_ROLE.CONTRIBUTOR,
@@ -44,7 +44,8 @@ router.post(
   "/:projectId/comment/:commentId/reply",
   replyController.createReply
 );
+router.get("/:commentId/replay", replyController.getAllReplysByComment);
 router.delete("/replay/delete/:replyId", replyController.deleteReply);
-router.patch("/:id", replyController.updateReply);
+router.patch("/replay/:replyId/update", replyController.updateReply);
 
 export const commentRoute = router;

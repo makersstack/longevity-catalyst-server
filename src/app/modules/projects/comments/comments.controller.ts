@@ -32,7 +32,6 @@ const createComment = catchAsync(async (req: Request, res: Response) => {
 const updateComment = catchAsync(async (req: Request, res: Response) => {
   const { commentText } = req.body;
   const commentId = Number(req.params.commentId);
-  const projectId = Number(req.params.projectId);
   const token = req.headers.authorization;
 
   if (!token) {
@@ -41,7 +40,6 @@ const updateComment = catchAsync(async (req: Request, res: Response) => {
 
   const updatedProject = await commentService.updateComment(
     token,
-    projectId,
     commentId,
     commentText
   );
