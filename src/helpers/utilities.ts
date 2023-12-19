@@ -30,7 +30,7 @@ const getUserRoleByToken = (token: string) => {
     token,
     config.jwt.secret as Secret
   );
-  console.log(verifiedToken);
+  // console.log(verifiedToken);
 
   const { userRole } = verifiedToken;
 

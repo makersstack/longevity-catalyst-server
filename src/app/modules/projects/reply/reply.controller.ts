@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import httpStatus from "http-status";
+import { paginationFileds } from "../../../../constants/pagination";
 import ApiError from "../../../../errors/ApiError";
 import catchAsync from "../../../../shared/catchAsync";
+import pick from "../../../../shared/pick";
 import sendResponse from "../../../../shared/sendResponse";
 import { replyService } from "./reply.services";
 
@@ -32,10 +34,8 @@ const createReply = catchAsync(async (req: Request, res: Response) => {
 
 const updateReply = catchAsync(async (req: Request, res: Response) => {
   const token = req.headers.authorization;
-  const projectId = Number(req.params.projectId);
-  const commentId = Number(req.params.commentId);
   const replyId = Number(req.params.replyId);
-  const replyText = req.body;
+  const { replyText } = req.body;
 
   if (!token) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "You are not authorized");
@@ -43,8 +43,6 @@ const updateReply = catchAsync(async (req: Request, res: Response) => {
 
   const updatedReply = await replyService.updateReply(
     token,
-    projectId,
-    commentId,
     replyId,
     replyText
   );
@@ -78,29 +76,27 @@ const deleteReply = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// const getAllReplysByComment = catchAsync(
-//   async (req: Request, res: Response) => {
-//     const paginationOptions = pick(req.query, paginationFileds);
-//     const projectId = Number(req.params.projectId);
-//     const commentId = Number(req.params.commentId);
+const getAllReplysByComment = catchAsync(
+  async (req: Request, res: Response) => {
+    const paginationOptions = pick(req.query, paginationFileds);
+    const commentId = Number(req.params.commentId);
 
-//     const replys = await replyService.getAllReplyByComment(
-//       projectId,
-//       commentId,
-//       paginationOptions
-//     );
+    const replys = await replyService.getAllReplyByComment(
+      commentId,
+      paginationOptions
+    );
 
-//     sendResponse(res, {
-//       statusCode: httpStatus.OK,
-//       success: true,
-//       message: "Comments Rettrif successfylly",
-//       data: replys,
-//     });
-//   }
-// );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Replies Rettrif successfylly",
+      data: replys,
+    });
+  }
+);
 export const replyController = {
   createReply,
   updateReply,
   deleteReply,
-  // getAllReplysByComment,
+  getAllReplysByComment,
 };

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from "http-status";
 import ApiError from "../../../../errors/ApiError";
+import { paginationHelpers } from "../../../../helpers/paginationHelpers";
 import { utilities } from "../../../../helpers/utilities";
 import { User } from "../../user/user.model";
 import Reply from "./reply.model";
@@ -50,12 +51,10 @@ const createReply = async (
 
 const updateReply = async (
   token: string,
-  projectId: number,
-  commentId: number,
   replyId: number,
   replyText: string
 ) => {
-  if (!token || !projectId || !commentId || !replyId || !replyText) {
+  if (!token || !replyId || !replyText) {
     throw new ApiError(httpStatus.NOT_ACCEPTABLE, "Invalid input data");
   }
   const userId = utilities.getUserIdByToken(token);
@@ -64,16 +63,20 @@ const updateReply = async (
     throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized");
   }
 
-  const replyToUpdate = await Reply.findByPk(replyId);
+  const replyToUpdate = await Reply.findByPk(replyId, {
+    include: [
+      {
+        model: User,
+        attributes: ["id", "full_name", "username", "email", "profileImage"],
+      },
+    ],
+  });
+
   if (!replyToUpdate) {
     throw new ApiError(httpStatus.NOT_FOUND, "Reply not found");
   }
 
-  if (
-    replyToUpdate.userId !== userId ||
-    replyToUpdate.projectId !== projectId ||
-    replyToUpdate.commentId !== commentId
-  ) {
+  if (replyToUpdate.userId !== userId) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
       "You are not allowed to update this comment"
@@ -116,9 +119,53 @@ const getSingleProject = async (projectId: string) => {
   return Reply.findByPk(Number(projectId));
 };
 
+const getAllReplyByComment = async (
+  commentId: number,
+  paginationOptions: any
+) => {
+  if (!commentId) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Comment are not found");
+  }
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  const options = {
+    where: {
+      commentId: commentId,
+    },
+    offset: skip,
+    limit,
+    order: [] as [string, string][],
+    include: [
+      {
+        model: User,
+        attributes: ["id", "full_name", "username", "email", "profileImage"],
+      },
+    ],
+    distinct: true,
+    subQuery: false,
+  };
+  if (sortBy && sortOrder) {
+    options.order.push([sortBy, sortOrder]);
+  }
+  const result = await Reply.findAndCountAll(options);
+  const total = result.count;
+
+  const responseData = {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result.rows,
+  };
+  return responseData;
+};
+
 export const replyService = {
   createReply,
   getSingleProject,
   updateReply,
   deleteReply,
+  getAllReplyByComment,
 };

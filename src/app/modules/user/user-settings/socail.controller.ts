@@ -15,7 +15,7 @@ const createSocailLinks = catchAsync(async (req: Request, res: Response) => {
   if (!token) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized");
   }
-  console.log("Here is token", token);
+  // console.log("Here is token", token);
   const varifyedToken = jwtHelpers.verifyToken(
     token,
     config.jwt.secret as Secret

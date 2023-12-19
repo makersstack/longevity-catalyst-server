@@ -5,7 +5,6 @@ import { paginationHelpers } from "../../../../helpers/paginationHelpers";
 import { utilities } from "../../../../helpers/utilities";
 import { User } from "../../user/user.model";
 import { Project } from "../project.model";
-import Reply from "../reply/reply.model";
 import Comment from "./comments.model";
 
 const createComment = async (
@@ -26,7 +25,7 @@ const createComment = async (
   if (!checkProject) {
     throw new ApiError(httpStatus.NOT_FOUND, "Project not found");
   }
-  console.log(projectId);
+  // console.log(projectId);
   const createdComment = await Comment.create({
     userId,
     commentText,
@@ -52,11 +51,10 @@ const createComment = async (
 
 const updateComment = async (
   token: string,
-  projectId: number,
   commentId: number,
   commentText: string
 ) => {
-  if (!token || !commentId || !commentText || !projectId) {
+  if (!token || !commentId || !commentText) {
     throw new ApiError(httpStatus.NOT_ACCEPTABLE, "Invalid input data");
   }
   const userId = utilities.getUserIdByToken(token);
@@ -68,13 +66,6 @@ const updateComment = async (
 
   if (!commentToUpdate) {
     throw new ApiError(httpStatus.NOT_FOUND, "Comment not found");
-  }
-
-  if (commentToUpdate.projectId !== projectId) {
-    throw new ApiError(
-      httpStatus.UNAUTHORIZED,
-      "You are not allowed to update this comment"
-    );
   }
 
   if (commentToUpdate.userId !== userId) {
@@ -136,22 +127,6 @@ const getAllCommentByProject = async (
       {
         model: User,
         attributes: ["id", "full_name", "username", "email", "profileImage"],
-      },
-      {
-        model: Reply,
-        attributes: ["id", "commentId", "replyText", "createdAt"],
-        include: [
-          {
-            model: User,
-            attributes: [
-              "id",
-              "full_name",
-              "username",
-              "email",
-              "profileImage",
-            ],
-          },
-        ],
       },
     ],
     distinct: true,

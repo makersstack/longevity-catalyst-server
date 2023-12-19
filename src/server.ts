@@ -25,7 +25,7 @@ process.on("unhandledRejection", (error) => {
 });
 
 process.on("SIGABRT", () => {
-  console.log("SIGABRT is Received");
+  // console.log("SIGABRT is Received");
   if (server) {
     server.close(() => {
       logger.info("Server is gracefully closed");
