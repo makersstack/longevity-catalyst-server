@@ -211,7 +211,7 @@ const getAllProjects = async (
   } else {
     const projects = await Project.findAndCountAll(options);
     result = projects.rows;
-    total = result.count;
+    total = projects.count;
   }
 
   result = await Promise.all(
@@ -411,7 +411,7 @@ const getAllProjectsByUsername = async (
   } else {
     const projects = await Project.findAndCountAll(options);
     result = projects.rows;
-    total = result.count;
+    total = projects.count;
   }
 
   result = await Promise.all(
