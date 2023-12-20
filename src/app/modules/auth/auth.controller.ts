@@ -70,17 +70,16 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
     );
   }
 
-  const isAuthorized = utilities.verifiedTokenAndDb(token);
-
-  if (!isAuthorized) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
-  }
-
   if (!passData) {
     throw new ApiError(httpStatus.NOT_ACCEPTABLE, "NOT_ACCEPTABLE");
   }
-  const getId = token;
-  const userId = Number(getId);
+
+  const userId = Number(utilities.getUserIdByToken(token));
+
+  if (!userId) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+  }
+
   const result = await AuthService.changePassword(userId, passData);
 
   sendResponse(res, {
@@ -103,8 +102,6 @@ const logoutUser = catchAsync(async (req: Request, res: Response) => {
       message: "User is not logged in",
     });
   }
-
-  // Invalidate or revoke the refresh token (e.g., delete it from the database or set it as invalid)
 
   // Clear the refresh token cookie by setting an expired date
   res.cookie("refreshToken", "", {
