@@ -122,8 +122,8 @@ const getAllProjects = catchAsync(
       statusCode: httpStatus.OK,
       success: true,
       message: "Projects retrieved successfully",
-      meta: result.meta,
-      data: result.data,
+      meta: result?.meta,
+      data: result?.data,
     });
   }
 );
@@ -156,8 +156,8 @@ const getAllProjectsByUsername = catchAsync(
       statusCode: httpStatus.OK,
       success: true,
       message: "Projects retrieved successfully",
-      meta: result.meta,
-      data: result.data,
+      meta: result?.meta,
+      data: result?.data,
     });
   }
 );
