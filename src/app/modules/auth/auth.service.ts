@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import bcrypt from "bcrypt";
 import httpStatus from "http-status";
 import { Secret } from "jsonwebtoken";
 import { Op } from "sequelize";
@@ -6,7 +7,9 @@ import config from "../../../config";
 import ApiError from "../../../errors/ApiError";
 import { jwtHelpers } from "../../../helpers/jwtHelpers";
 import { User } from "../user/user.model";
+
 import {
+  IChangePassword,
   ILoginUser,
   ILoginUserResponse,
   IRefreshTokenResponse,
@@ -99,15 +102,36 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
   };
 };
 
-const changePassword = async (userId: number, passData: string) => {
+const changePassword = async (userId: number, passData: IChangePassword) => {
   const user = await User.findByPk(userId);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found");
   }
-  user.password = passData;
+
+  // Verify the old password
+  const isPasswordValid = await bcrypt.compare(
+    passData.oldPassword,
+    user.password
+  );
+
+  if (!isPasswordValid) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Old password is incorrect");
+  }
+
+  if (passData.oldPassword === passData.newPassword) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Old password is incorrect");
+  }
+
+  // Hash the new password before updating
+  const hashedNewPassword = await bcrypt.hash(
+    passData.newPassword,
+    Number(config.bcrypt_salt_rounds)
+  );
+
+  user.password = hashedNewPassword;
 
   await user.save();
-  return user;
+  return true;
 };
 
 export const AuthService = {
