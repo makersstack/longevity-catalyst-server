@@ -10,6 +10,7 @@ import { User } from "./user.model";
 
 const createUser = async (userData: any): Promise<any> => {
   // Check if the username or email is already in use
+
   const existingUser = await User.findOne({
     where: {
       [Op.or]: [{ username: userData.username }, { email: userData.email }],
@@ -61,15 +62,36 @@ const getAllUsers = async (): Promise<IUser[] | null> => {
 // For Update User
 const updateUser = async (
   username: string,
-  updateData: Partial<IUser>
-): Promise<IUser | null> => {
+  updateData: any,
+  id: number
+): Promise<any> => {
   const user = await User.findOne({ where: { username } });
+
   if (!user) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "User Not Found");
+    throw new ApiError(httpStatus.NOT_FOUND, "User Not Found");
   }
-  user.set(updateData);
+
+  if (id !== user.id) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Mismatching user");
+  }
+
+  const allowedFields: Array<keyof IUser> = [
+    "full_name",
+    "company",
+    "bio",
+    "profileImage",
+  ];
+
+  if (typeof updateData === "object" && updateData !== null) {
+    for (const field of allowedFields) {
+      if (field in updateData) {
+        (user as any)[field] = updateData[field];
+      }
+    }
+  }
 
   await user.save();
+  await user.reload();
 
   const updatedUserPlainData = user.toJSON() as IUser;
   return updatedUserPlainData;

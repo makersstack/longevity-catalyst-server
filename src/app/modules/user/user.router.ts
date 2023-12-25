@@ -1,4 +1,5 @@
 import express from "express";
+import upload from "../../middlewares/multer";
 import { UserController } from "./user.controller";
 
 const router = express.Router();
@@ -7,7 +8,11 @@ const router = express.Router();
 router.get("/", UserController.getAllUsers);
 router.get("/:username", UserController.getUserByUserName);
 router.get("/profile/:id", UserController.getUserInfoById);
-router.patch("/:username", UserController.updateUser);
+router.patch(
+  "/:username/update",
+  upload.single("profileImage"),
+  UserController.updateUser
+);
 router.delete("/:id/delete", UserController.deleteUser);
 
 export const UserRoutes = router;

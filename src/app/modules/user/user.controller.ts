@@ -58,7 +58,7 @@ const createUser = catchAsync(
 );
 
 const updateUser = catchAsync(async (req: Request, res: Response) => {
-  const userName = req.params.username;
+  const userName = String(req.params.username);
   const updateData = req.body;
   const token = req.headers.authorization;
   if (!token) {
@@ -67,24 +67,49 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
       "Unauthorized access. Please log in."
     );
   }
-  const isAuthorized = utilities.verifiedTokenAndDb(token);
-  if (!isAuthorized) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+  const id = utilities.getUserIdByToken(token);
+
+  if (req.file) {
+    // @ts-ignore
+    cloudinary.uploader.upload(req.file?.path, async function (err, result) {
+      if (err || !result) {
+        return res.status(500).json({
+          success: false,
+          message: "Error uploading image",
+        });
+      }
+      updateData.profileImage = result.secure_url;
+
+      const userDetails = await userService.updateUser(
+        userName,
+        updateData,
+        id
+      );
+      const { password, ...userData } = userDetails;
+
+      // sendResponse<IResponse>(res, {
+      sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "User created successfully!",
+        data: userData,
+      });
+    });
+  } else {
+    const userDetails = await userService.updateUser(userName, updateData, id);
+
+    if (!userDetails) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "User data not updated");
+    }
+    const { password, ...userData } = userDetails;
+
+    sendResponse<IResponse>(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Users Update successfully",
+      data: userDetails,
+    });
   }
-
-  const userDetails = await userService.updateUser(userName, updateData);
-
-  if (!userDetails) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "User data not updated");
-  }
-  const { password, ...userData } = userDetails;
-
-  sendResponse<IResponse>(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Users retrieved successfully",
-    data: userData,
-  });
 });
 // Get all users
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
