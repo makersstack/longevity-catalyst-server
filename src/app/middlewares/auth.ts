@@ -19,7 +19,6 @@ const auth =
         token,
         config.jwt.secret as Secret
       );
-
       // Check if verifiedUser is not null
       if (!verifiedUser) {
         throw new ApiError(
@@ -27,9 +26,11 @@ const auth =
           "You don't have permission to perform this operation."
         );
       }
-
       // Role-based authorization
-      if (requiredRoles.length && !requiredRoles.includes(verifiedUser.role)) {
+      if (
+        requiredRoles.length &&
+        !requiredRoles.includes(verifiedUser.userRole)
+      ) {
         throw new ApiError(
           httpStatus.NOT_ACCEPTABLE,
           "You don't have permission to perform this operation."
