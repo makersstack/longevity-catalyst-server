@@ -473,13 +473,18 @@ const getAllProjectsByUsername = async (
     })
   );
 
-  const responseData: IGenericResponse<Project[]> = {
+  const newResult = {
+    userData: user,
+    projects: result,
+  };
+
+  const responseData: IGenericResponse<Project[] | any> = {
     meta: {
       page,
       limit,
       total,
     },
-    data: result,
+    data: newResult,
   };
   return responseData;
 };
