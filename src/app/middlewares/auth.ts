@@ -22,14 +22,17 @@ const auth =
 
       // Check if verifiedUser is not null
       if (!verifiedUser) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "You are not authorized");
+        throw new ApiError(
+          httpStatus.NOT_ACCEPTABLE,
+          "You don't have permission to perform this operation."
+        );
       }
 
       // Role-based authorization
       if (requiredRoles.length && !requiredRoles.includes(verifiedUser.role)) {
         throw new ApiError(
-          httpStatus.UNAUTHORIZED,
-          "Forbidden: You are not authorized"
+          httpStatus.NOT_ACCEPTABLE,
+          "You don't have permission to perform this operation."
         );
       }
 
