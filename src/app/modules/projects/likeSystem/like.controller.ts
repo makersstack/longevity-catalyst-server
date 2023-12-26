@@ -5,20 +5,20 @@ import catchAsync from "../../../../shared/catchAsync";
 import sendResponse from "../../../../shared/sendResponse";
 import { likeService } from "./like.services";
 
-const createOrRemoveLike = catchAsync(async (req: Request, res: Response) => {
+const projectLikeOperation = catchAsync(async (req: Request, res: Response) => {
   const token = req.headers.authorization;
   if (!token) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "UNAUTHORIZED");
+    throw new ApiError(httpStatus.UNAUTHORIZED, "User not found!");
   }
 
-  const postId = req.params;
+  const operationData = req.body;
 
-  const result = await likeService.createOrRemoveLike(token, postId);
+  const result = await likeService.projectLikeOperation(token, operationData);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Users retrieved successfully",
+    message: "Operation successfully",
     data: result,
   });
 });
@@ -39,7 +39,7 @@ const getAllLikesByPost = catchAsync(async (req: Request, res: Response) => {
 const getAllLikesByUser = catchAsync(async (req: Request, res: Response) => {
   const token = req.headers.authorization;
   if (!token) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Sorry");
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
   }
 
   const getLikes = await likeService.getAllLikesByUser(token);
@@ -52,27 +52,7 @@ const getAllLikesByUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// project like operation
-const projectLikeOperation = catchAsync(async (req: Request, res: Response) => {
-  const token = req.headers.authorization;
-  if (!token) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "UNAUTHORIZED");
-  }
-
-  const operationData = req.body;
-
-  const result = await likeService.createOrRemoveLike(token, operationData);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Operation successfully",
-    data: result,
-  });
-});
-
 export const likeController = {
-  createOrRemoveLike,
   getAllLikesByPost,
   getAllLikesByUser,
   projectLikeOperation,

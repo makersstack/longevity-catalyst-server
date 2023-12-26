@@ -6,10 +6,10 @@ import { jwtHelpers } from "../../../../helpers/jwtHelpers";
 import { utilities } from "../../../../helpers/utilities";
 import { ProjectLike } from "./like.model";
 
-const createOrRemoveLike = async (token: string, operationData: any) => {
+const projectLikeOperation = async (token: string, operationData: any) => {
   const isAuthorized = utilities.verifiedTokenAndDb(token);
   if (!isAuthorized) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized!");
+    throw new ApiError(httpStatus.NOT_FOUND, "User Not Found!");
   }
 
   const userInfo = (await utilities.tokenToUserInfo(token)) as any;
@@ -72,7 +72,7 @@ const getAllLikesByUser = async (token: string) => {
 };
 
 export const likeService = {
-  createOrRemoveLike,
+  projectLikeOperation,
   getAllLikesByPost,
   getAllLikesByUser,
 };

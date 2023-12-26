@@ -35,7 +35,7 @@ const updateComment = catchAsync(async (req: Request, res: Response) => {
   const token = req.headers.authorization;
 
   if (!token) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "You are not authorized");
+    throw new ApiError(httpStatus.NOT_FOUND, "You are not authorized");
   }
 
   const updatedProject = await commentService.updateComment(
@@ -56,7 +56,7 @@ const deleteComment = catchAsync(async (req: Request, res: Response) => {
   const commentId = Number(req.params.commentId);
   const token = req.headers.authorization;
   if (!token) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "You are unauthorized");
+    throw new ApiError(httpStatus.NOT_FOUND, "You are unauthorized");
   }
   const deletedComment = await commentService.deleteComment(token, commentId);
 

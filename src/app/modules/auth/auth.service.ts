@@ -18,7 +18,7 @@ import {
 const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   const { identifier, password } = payload;
   if (!identifier) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Username or email is required");
+    throw new ApiError(httpStatus.BAD_REQUEST, "Invalid username or password");
   }
 
   // Check if the user exists by email or username
@@ -30,10 +30,7 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   });
 
   if (!user) {
-    throw new ApiError(
-      httpStatus.UNAUTHORIZED,
-      `No user found with username or email: ${identifier}`
-    );
+    throw new ApiError(httpStatus.BAD_REQUEST, `Invalid username or password`);
   }
 
   // Verify the password
@@ -43,7 +40,7 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   );
 
   if (!isPasswordValid) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Invalid credentials");
+    throw new ApiError(httpStatus.BAD_REQUEST, "Invalid username or password");
   }
 
   const { id: userId, role: userRole } = user as any;
@@ -75,7 +72,7 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
       config.jwt.refresh_secret as Secret
     );
   } catch (err) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Invalid Refresh Token");
+    throw new ApiError(httpStatus.NOT_ACCEPTABLE, "Invalid Refresh Token");
   }
 
   const { userId } = verifiedToken;

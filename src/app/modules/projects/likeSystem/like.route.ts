@@ -17,8 +17,6 @@ router.post(
   likeController.projectLikeOperation
 );
 
-// Define routes
-// router.post("/", likeController.createOrRemoveLike);
 router.get("/", likeController.getAllLikesByPost);
 
 export const LikeRouter = router;
