@@ -43,16 +43,16 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
     throw new ApiError(httpStatus.BAD_REQUEST, "Invalid username or password");
   }
 
-  const { id: userId, role: userRole } = user as any;
+  const { id: userId, role: role } = user as any;
 
   const accessToken = jwtHelpers.createToken(
-    { userId, userRole },
+    { userId, role },
     config.jwt.secret as Secret,
     config.jwt.expires_in as string
   );
 
   const refreshToken = jwtHelpers.createToken(
-    { userId, userRole },
+    { userId, role },
     config.jwt.refresh_secret as Secret,
     config.jwt.refresh_expires_in as string
   );
@@ -72,7 +72,7 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
       config.jwt.refresh_secret as Secret
     );
   } catch (err) {
-    throw new ApiError(httpStatus.NOT_ACCEPTABLE, "Invalid Refresh Token");
+    throw new ApiError(httpStatus.NOT_ACCEPTABLE, "Refresh Token - expire");
   }
 
   const { userId } = verifiedToken;
@@ -88,7 +88,7 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
   const newAccessToken = jwtHelpers.createToken(
     {
       userId: (isUserExist as any).id,
-      userRole: (isUserExist as any).role,
+      role: (isUserExist as any).role,
     },
     config.jwt.secret as Secret,
     config.jwt.expires_in as string
@@ -112,11 +112,14 @@ const changePassword = async (userId: number, passData: IChangePassword) => {
   );
 
   if (!isPasswordValid) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Old password is incorrect");
+    throw new ApiError(httpStatus.BAD_REQUEST, "Current password is incorrect");
   }
 
   if (passData.oldPassword === passData.newPassword) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Old password is incorrect");
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "New password should be different from the old password."
+    );
   }
 
   // Hash the new password before updating
