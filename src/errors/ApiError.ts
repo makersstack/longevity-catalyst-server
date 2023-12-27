@@ -5,7 +5,8 @@ class ApiError extends Error {
     super(message);
     this.statusCode = statusCode;
     if (stack) {
-      this.stack = stack;
+      this.stack = "";
+      // this.stack = config.env !== "production" ? stack : undefined;
     } else {
       Error.captureStackTrace(this, this.constructor);
     }

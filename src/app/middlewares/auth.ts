@@ -27,10 +27,7 @@ const auth =
         );
       }
       // Role-based authorization
-      if (
-        requiredRoles.length &&
-        !requiredRoles.includes(verifiedUser.userRole)
-      ) {
+      if (requiredRoles.length && !requiredRoles.includes(verifiedUser.role)) {
         throw new ApiError(
           httpStatus.NOT_ACCEPTABLE,
           "You don't have permission to perform this operation."

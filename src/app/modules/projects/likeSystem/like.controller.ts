@@ -10,7 +10,6 @@ const projectLikeOperation = catchAsync(async (req: Request, res: Response) => {
   if (!token) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "User not found!");
   }
-
   const operationData = req.body;
 
   const result = await likeService.projectLikeOperation(token, operationData);

@@ -32,9 +32,9 @@ const getUserRoleByToken = (token: string) => {
   );
   // console.log(verifiedToken);
 
-  const { userRole } = verifiedToken;
+  const { role } = verifiedToken;
 
-  return userRole;
+  return role;
 };
 
 const tokenToUserInfo = async (token: string) => {
