@@ -95,11 +95,12 @@ const logoutUser = catchAsync(async (req: Request, res: Response) => {
   const { refreshToken } = req.cookies;
 
   // If the refresh token doesn't exist or is invalid, respond with an error or appropriate status
-  if (!refreshToken) {
-    return sendResponse(res, {
-      statusCode: httpStatus.UNAUTHORIZED,
-      success: false,
-      message: "User is not logged in",
+  if (refreshToken) {
+    res.cookie("refreshToken", "", {
+      httpOnly: true,
+      expires: new Date(0),
+      secure: config.env === "development",
+      path: "/",
     });
   }
 
