@@ -24,3 +24,10 @@ export type IResponse = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export interface EmailInterface {
+  sendVerificationEmail(
+    email: string,
+    verificationToken: string
+  ): Promise<void>;
+}
