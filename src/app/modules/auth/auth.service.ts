@@ -72,6 +72,7 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
       config.jwt.refresh_secret as Secret
     );
   } catch (err) {
+    console.log("Hello", err);
     throw new ApiError(httpStatus.NOT_ACCEPTABLE, "Refresh Token - expire");
   }
 
