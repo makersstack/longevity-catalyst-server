@@ -1,6 +1,7 @@
 import express from "express";
 import { AdminRoute } from "../modules/admin/admin.router";
 import { AuthRoutes } from "../modules/auth/auth.route";
+import { ProfileRouter } from "../modules/profile/profile.route";
 import { categoryRoute } from "../modules/projects/categories/categories.route";
 import { commentRoute } from "../modules/projects/comments/comments.route";
 import { LikeRouter } from "../modules/projects/likeSystem/like.route";
@@ -62,6 +63,10 @@ const moduleRoutes = [
   {
     path: "/vote",
     route: VoteRouter,
+  },
+  {
+    path: "/profile",
+    route: ProfileRouter,
   },
 ];
 

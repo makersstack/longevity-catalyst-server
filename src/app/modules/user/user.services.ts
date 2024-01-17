@@ -5,6 +5,9 @@ import { Op } from "sequelize";
 import config from "../../../config";
 import ApiError from "../../../errors/ApiError";
 import { sendEmail } from "../../../helpers/nodemailerUtil";
+import { utilities } from "../../../helpers/utilities";
+import { ProfileFollow } from "../profile/follow/follow.model";
+import { ProfileNotify } from "../profile/notification/notification.model";
 import { IUser } from "./user.interface";
 import { User } from "./user.model";
 
@@ -94,7 +97,10 @@ const updateUser = async (
 };
 
 // For Single User
-const getUserByUserName = async (userName: string): Promise<IUser | null> => {
+const getUserByUserName = async (
+  userName: string,
+  userToken: string | null
+): Promise<IUser | null | any> => {
   const user = await User.findOne({
     where: { username: userName },
     attributes: { exclude: ["password"] },
@@ -102,9 +108,39 @@ const getUserByUserName = async (userName: string): Promise<IUser | null> => {
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "User Not Found");
   }
+  let isNotify = false;
+  let isFollow = false;
+  if (userToken !== null) {
+    const userInfo = (await utilities.tokenToUserInfo(userToken)) as any;
+    const NotifyCount = await ProfileNotify.count({
+      where: { notify_by: userInfo.id, notify_to: user.id },
+    });
+    if (NotifyCount > 0) {
+      isNotify = true;
+    }
+    const FollowCount = await ProfileFollow.count({
+      where: { follow_by: userInfo.id, follow_to: user.id },
+    });
+    if (FollowCount > 0) {
+      isFollow = true;
+    }
+  }
+  const followerCount = await ProfileFollow.count({
+    where: { follow_to: user.id },
+  });
+  const followingCount = await ProfileFollow.count({
+    where: { follow_by: user.id },
+  });
 
   const userPlainData = user.toJSON() as IUser;
-  return userPlainData;
+  return {
+    ...userPlainData,
+    isNotify,
+    isFollow,
+    followerCount,
+    followingCount,
+  };
+  // return userPlainData;
 };
 
 const getUserInfoById = async (userId: number): Promise<IUser | null> => {
