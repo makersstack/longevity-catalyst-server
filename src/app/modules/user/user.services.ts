@@ -4,8 +4,8 @@ import httpStatus from "http-status";
 import { Op } from "sequelize";
 import config from "../../../config";
 import ApiError from "../../../errors/ApiError";
+import { sendEmail } from "../../../helpers/nodemailerUtil";
 import { utilities } from "../../../helpers/utilities";
-import { logger } from "../../../shared/logger";
 import { ProfileFollow } from "../profile/follow/follow.model";
 import { ProfileNotify } from "../profile/notification/notification.model";
 import { IUser } from "./user.interface";
@@ -35,17 +35,13 @@ const createUser = async (userData: any): Promise<any> => {
 
   userData.password = hashedPassword;
 
-  if (userData.profileImage) {
-    logger.info("Image Id response");
-  }
-
-  const user = await User.create(userData, {
+  await User.create(userData, {
     returning: true,
     plain: true,
     attributes: { exclude: ["password"] },
   });
-  const userPlainData = user.toJSON() as IUser;
-  return userPlainData;
+
+  return true;
 };
 
 // For all users
@@ -180,6 +176,18 @@ const deleteUser = async (userId: number): Promise<IUser | null> => {
 
   return findUser.toJSON() as IUser;
 };
+
+// For Email
+export const sendVerificationEmail = async (
+  email: string,
+  verificationToken: string
+): Promise<void> => {
+  const subject = "Confirm Your Email";
+  const html = `<p>Click <a href="http://your-frontend-app/verify-email?token=${verificationToken}">here</a> to confirm your email.</p>`;
+
+  await sendEmail(email, subject, html);
+};
+
 export const userService = {
   createUser,
   updateUser,

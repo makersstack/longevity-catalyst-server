@@ -1,4 +1,6 @@
 import express from "express";
+import { ENUM_USER_ROLE } from "../../../enums/user";
+import auth from "../../middlewares/auth";
 import upload from "../../middlewares/multer";
 import { UserController } from "./user.controller";
 
@@ -10,6 +12,12 @@ router.get("/:username", UserController.getUserByUserName);
 router.get("/profile/:id", UserController.getUserInfoById);
 router.patch(
   "/:username/update",
+  auth(
+    ENUM_USER_ROLE.REGULARUSER,
+    ENUM_USER_ROLE.CONTRIBUTOR,
+    ENUM_USER_ROLE.RESEARCHER,
+    ENUM_USER_ROLE.ADMIN
+  ),
   upload.single("profileImage"),
   UserController.updateUser
 );
