@@ -4,7 +4,7 @@
 //   port: 465,
 //   host: "smtp.gmail.com",
 //   auth: {
-
+//     user: "shihab.warfaze@gmail.com",
 //   },
 //   secure: true,
 // });

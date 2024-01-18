@@ -211,6 +211,22 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const userSubscriBing = catchAsync(async (req: Request, res: Response) => {
+  const { email } = req.body;
+  if (!email) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Email not set");
+  }
+
+  const result = await userService.userSubscriBing(email);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Subscribing successful",
+    data: result,
+  });
+});
+
 export const UserController = {
   createUser,
   updateUser,
@@ -218,4 +234,5 @@ export const UserController = {
   getUserByUserName,
   getUserInfoById,
   deleteUser,
+  userSubscriBing,
 };

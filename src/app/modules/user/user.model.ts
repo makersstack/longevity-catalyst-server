@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { DataTypes, Model, Op } from "sequelize";
 import sequelize from "../../../config/sequelize-config";
-import { IUser } from "./user.interface";
+import { IUser, Subscribing } from "./user.interface";
 
 class User extends Model<IUser> {
   public id!: number;
@@ -81,7 +81,32 @@ User.init(
   }
 );
 
+class SubscriBing extends Model<Subscribing> {
+  public id!: number;
+}
+SubscriBing.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      unique: true,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+  },
+  {
+    sequelize,
+    modelName: "Subscribing",
+    tableName: "subscribing",
+    timestamps: true,
+  }
+);
 // User.hasOne(UserSkill, { foreignKey: "UserId" });
 // User.hasOne(UserSocail, { foreignKey: "UserId" });
 
-export { User };
+export { SubscriBing, User };

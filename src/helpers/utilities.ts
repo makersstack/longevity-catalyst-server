@@ -51,10 +51,25 @@ const tokenToUserInfo = async (token: string) => {
   }
 };
 
+const generateUniqueCode = (): string => {
+  const codeLength = 10;
+  const characters =
+    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  let code = "";
+
+  for (let i = 0; i < codeLength; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    code += characters.charAt(randomIndex);
+  }
+
+  return code;
+};
+
 export const utilities = {
   verifyUserByDb,
   getUserIdByToken,
   getUserRoleByToken,
   verifiedTokenAndDb,
   tokenToUserInfo,
+  generateUniqueCode,
 };
