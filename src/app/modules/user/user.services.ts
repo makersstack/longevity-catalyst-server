@@ -4,7 +4,6 @@ import httpStatus from "http-status";
 import { Op } from "sequelize";
 import config from "../../../config";
 import ApiError from "../../../errors/ApiError";
-import { sendEmail } from "../../../helpers/nodemailerUtil";
 import { utilities } from "../../../helpers/utilities";
 import { ProfileFollow } from "../profile/follow/follow.model";
 import { ProfileNotify } from "../profile/notification/notification.model";
@@ -178,15 +177,15 @@ const deleteUser = async (userId: number): Promise<IUser | null> => {
 };
 
 // For Email
-export const sendVerificationEmail = async (
-  email: string,
-  verificationToken: string
-): Promise<void> => {
-  const subject = "Confirm Your Email";
-  const html = `<p>Click <a href="http://your-frontend-app/verify-email?token=${verificationToken}">here</a> to confirm your email.</p>`;
+// export const sendVerificationEmail = async (
+//   email: string,
+//   verificationToken: string
+// ): Promise<void> => {
+//   const subject = "Confirm Your Email";
+//   const html = `<p>Click <a href="http://your-frontend-app/verify-email?token=${verificationToken}">here</a> to confirm your email.</p>`;
 
-  await sendEmail(email, subject, html);
-};
+//   await sendEmail(email, subject, html);
+// };
 
 export const userService = {
   createUser,
