@@ -23,4 +23,6 @@ router.patch(
 );
 router.delete("/:id/delete", UserController.deleteUser);
 
+router.post("/subscriptions", UserController.userSubscriBing);
+
 export const UserRoutes = router;

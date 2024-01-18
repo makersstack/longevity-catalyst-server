@@ -1,16 +1,26 @@
-import nodemailer from "nodemailer";
+// import nodemailer from "nodemailer";
 
-const transporter = nodemailer.createTransport({
-  // Your email configuration
-});
+// const transporter = nodemailer.createTransport({
+//   port: 465,
+//   host: "smtp.gmail.com",
+//   auth: {
+//     user: "shihab.warfaze@gmail.com",
+//   },
+//   secure: true,
+// });
 
-export const sendEmail = (to: string, subject: string, html: string) => {
-  const mailOptions = {
-    from: "your-email@example.com",
-    to,
-    subject,
-    html,
-  };
-
-  return transporter.sendMail(mailOptions);
-};
+// export const sendEmail = async (to: string, subject: string, html: string) => {
+//   const mailOptions = {
+//     from: "shihab.warfaze@gmail.com",
+//     to,
+//     subject,
+//     html,
+//   };
+//   try {
+//     const result = await transporter.sendMail(mailOptions);
+//     console.log("Email sent:", result);
+//   } catch (error) {
+//     console.error("Error sending email:", error);
+//     throw error;
+//   }
+// };

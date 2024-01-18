@@ -25,9 +25,6 @@ export type IResponse = {
   updatedAt: Date;
 };
 
-export interface EmailInterface {
-  sendVerificationEmail(
-    email: string,
-    verificationToken: string
-  ): Promise<void>;
+export interface Subscribing {
+  email: string;
 }

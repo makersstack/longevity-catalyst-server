@@ -4,16 +4,14 @@ import httpStatus from "http-status";
 import { Op } from "sequelize";
 import config from "../../../config";
 import ApiError from "../../../errors/ApiError";
-import { sendEmail } from "../../../helpers/nodemailerUtil";
 import { utilities } from "../../../helpers/utilities";
 import { ProfileFollow } from "../profile/follow/follow.model";
 import { ProfileNotify } from "../profile/notification/notification.model";
 import { IUser } from "./user.interface";
-import { User } from "./user.model";
+import { SubscriBing, User } from "./user.model";
 
 const createUser = async (userData: any): Promise<any> => {
   // Check if the username or email is already in use
-
   const existingUser = await User.findOne({
     where: {
       [Op.or]: [{ username: userData.username }, { email: userData.email }],
@@ -176,16 +174,21 @@ const deleteUser = async (userId: number): Promise<IUser | null> => {
 
   return findUser.toJSON() as IUser;
 };
+const userSubscriBing = async (email: string) => {
+  if (!email) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Email Not found");
+  }
 
-// For Email
-export const sendVerificationEmail = async (
-  email: string,
-  verificationToken: string
-): Promise<void> => {
-  const subject = "Confirm Your Email";
-  const html = `<p>Click <a href="http://your-frontend-app/verify-email?token=${verificationToken}">here</a> to confirm your email.</p>`;
+  // Check if the email is already subscribed
+  const existingSubscription = await SubscriBing.findOne({ where: { email } });
 
-  await sendEmail(email, subject, html);
+  if (existingSubscription) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Email is already subscribed.");
+  }
+  // Create a new subscription
+  const newSubscription = await SubscriBing.create({ email });
+
+  return newSubscription;
 };
 
 export const userService = {
@@ -195,4 +198,5 @@ export const userService = {
   getUserInfoById,
   getUserByUserName,
   deleteUser,
+  userSubscriBing,
 };
