@@ -28,3 +28,6 @@ export type IResponse = {
 export interface Subscribing {
   email: string;
 }
+export type ISubscribing = {
+  email: string;
+};
