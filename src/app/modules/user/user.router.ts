@@ -18,8 +18,8 @@ router.patch(
     ENUM_USER_ROLE.RESEARCHER,
     ENUM_USER_ROLE.ADMIN
   ),
-  upload.single("profileImage"),
-  UserController.updateUser
+  UserController.updateUser,
+  upload.single("profileImage")
 );
 router.delete("/:id/delete", UserController.deleteUser);
 

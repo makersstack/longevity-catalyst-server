@@ -7,7 +7,7 @@ import ApiError from "../../../errors/ApiError";
 import { utilities } from "../../../helpers/utilities";
 import { ProfileFollow } from "../profile/follow/follow.model";
 import { ProfileNotify } from "../profile/notification/notification.model";
-import { IUser } from "./user.interface";
+import { ISubscribing, IUser, Subscribing } from "./user.interface";
 import { SubscriBing, User } from "./user.model";
 
 const createUser = async (userData: any): Promise<any> => {
@@ -174,11 +174,10 @@ const deleteUser = async (userId: number): Promise<IUser | null> => {
 
   return findUser.toJSON() as IUser;
 };
-const userSubscriBing = async (email: string) => {
+const userSubscriBing = async (email: string): Promise<ISubscribing | null> => {
   if (!email) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Email Not found");
+    throw new ApiError(httpStatus.NOT_FOUND, "Invalid email address");
   }
-
   // Check if the email is already subscribed
   const existingSubscription = await SubscriBing.findOne({ where: { email } });
 
@@ -188,7 +187,9 @@ const userSubscriBing = async (email: string) => {
   // Create a new subscription
   const newSubscription = await SubscriBing.create({ email });
 
-  return newSubscription;
+  const subsData = newSubscription.toJSON() as Subscribing;
+
+  return subsData;
 };
 
 export const userService = {

@@ -86,13 +86,6 @@ class SubscriBing extends Model<Subscribing> {
 }
 SubscriBing.init(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      unique: true,
-      primaryKey: true,
-      autoIncrement: true,
-      allowNull: false,
-    },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
