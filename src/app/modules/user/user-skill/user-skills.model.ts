@@ -3,7 +3,11 @@ import sequelize from "../../../../config/sequelize-config";
 import { Skill } from "../../skills/skills.model";
 import { User } from "../user.model";
 
-class UserSkill extends Model {}
+class UserSkill extends Model {
+  id!: number;
+  userId!: number;
+  skillId!: number;
+}
 
 UserSkill.init(
   {
@@ -17,18 +21,10 @@ UserSkill.init(
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: User,
-        key: "id",
-      },
     },
     skillId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: Skill,
-        key: "id",
-      },
     },
   },
   {
@@ -39,7 +35,15 @@ UserSkill.init(
   }
 );
 
-UserSkill.belongsTo(User, { foreignKey: "userId" });
-UserSkill.belongsTo(Skill, { foreignKey: "skillId" });
+User.belongsToMany(Skill, {
+  through: UserSkill,
+  foreignKey: "userId",
+  onDelete: "CASCADE",
+});
+Skill.belongsToMany(User, {
+  through: UserSkill,
+  foreignKey: "skillId",
+  onDelete: "CASCADE",
+});
 
 export { UserSkill };

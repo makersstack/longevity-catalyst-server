@@ -7,8 +7,10 @@ import ApiError from "../../../errors/ApiError";
 import { utilities } from "../../../helpers/utilities";
 import { ProfileFollow } from "../profile/follow/follow.model";
 import { ProfileNotify } from "../profile/notification/notification.model";
+import { Skill } from "../skills/skills.model";
 import { UserDetailsInterface } from "./user-details/userDetails.interface";
 import { UserDetails } from "./user-details/userDetails.model";
+import { UserSkill } from "./user-skill/user-skills.model";
 import { IResponse, ISubscribing, IUser, Subscribing } from "./user.interface";
 import { SubscriBing, User } from "./user.model";
 
@@ -96,7 +98,7 @@ const updateUser = async (
     "company",
     "bio",
   ];
-
+  // console.log(updateData);
   if (typeof updateData === "object" && updateData !== null) {
     for (const field of allowedFields) {
       if (field in updateData) {
@@ -109,6 +111,35 @@ const updateUser = async (
       }
     }
   }
+  const { skills } = updateData;
+  const skillsArray = JSON.parse(skills);
+
+  // Fetch existing skills
+  const existingSkills = await UserSkill.findAll({
+    where: { userId: id },
+    attributes: ["skillId"],
+  });
+  // console.log(existingSkills.skillId);
+
+  const existingSkillsArray = existingSkills.map((skill) => skill.skillId);
+
+  // Identify skills to be added and deleted
+  const skillsToAdd = skillsArray.filter(
+    (skill: any) => !existingSkillsArray.includes(skill)
+  );
+  const skillsToDelete = existingSkillsArray.filter(
+    (skill) => !skillsArray.includes(skill)
+  );
+
+  // Delete skills
+  await UserSkill.destroy({
+    where: { userId: id, skillId: skillsToDelete },
+  });
+
+  // Add new skills
+  await UserSkill.bulkCreate(
+    skillsToAdd.map((skill: any) => ({ userId: id, skillId: skill }))
+  );
 
   await user.save();
   await userDetails.save();
@@ -117,6 +148,12 @@ const updateUser = async (
       {
         model: UserDetails,
         attributes: { exclude: ["createdAt", "updatedAt", "id", "userId"] },
+      },
+      {
+        model: Skill,
+        through: {
+          attributes: [], // Exclude the join table attributes if needed
+        },
       },
     ],
   });
@@ -137,6 +174,12 @@ const getUserByUserName = async (
       {
         model: UserDetails,
         attributes: { exclude: ["createdAt", "updatedAt", "id", "userId"] },
+      },
+      {
+        model: Skill,
+        through: {
+          attributes: [], // Exclude the join table attributes if needed
+        },
       },
     ],
   });
@@ -192,6 +235,12 @@ const getUserInfoById = async (userId: number): Promise<IUser | null> => {
       {
         model: UserDetails,
         attributes: { exclude: ["createdAt", "updatedAt", "id", "userId"] },
+      },
+      {
+        model: Skill,
+        through: {
+          attributes: [], // Exclude the join table attributes if needed
+        },
       },
     ],
   });
