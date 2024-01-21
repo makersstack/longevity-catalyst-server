@@ -44,11 +44,9 @@ const notificationOperation = async (token: string, operationData: any) => {
         returning: true,
         plain: true,
       });
-      console.log(notifyData);
     }
   } else {
     if (existingNotify !== null) {
-      console.log("bye");
       await ProfileNotify.destroy({
         where: notifyData,
       });

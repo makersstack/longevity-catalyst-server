@@ -5,8 +5,6 @@ export interface IUser {
   role: string;
   email: string;
   password: string;
-  company?: string | null;
-  bio?: string | null;
   profileImage?: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -18,8 +16,6 @@ export type IResponse = {
   username: string;
   role: string;
   email: string;
-  company?: string | null;
-  bio?: string | null;
   profileImage?: string | null;
   createdAt: Date;
   updatedAt: Date;
