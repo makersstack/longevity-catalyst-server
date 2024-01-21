@@ -87,7 +87,6 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
       );
       const { password, ...userData } = userDetails;
 
-      // sendResponse<IResponse>(res, {
       sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
@@ -107,7 +106,7 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
       statusCode: httpStatus.OK,
       success: true,
       message: "Users Update successfully",
-      data: userDetails,
+      data: userData,
     });
   }
 });
