@@ -57,59 +57,65 @@ const createUser = catchAsync(
   }
 );
 
-const updateUser = catchAsync(async (req: Request, res: Response) => {
-  const userName = String(req.params.username);
-  const updateData = req.body;
-  const token = req.headers.authorization;
-  if (!token) {
-    throw new ApiError(
-      httpStatus.UNAUTHORIZED,
-      "Unauthorized access. Please log in."
-    );
-  }
-  const id = utilities.getUserIdByToken(token);
+const updateUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userName = String(req.params.username);
+    const updateData = req.body;
+    const token = req.headers.authorization;
+    if (!token) {
+      throw new ApiError(
+        httpStatus.UNAUTHORIZED,
+        "Unauthorized access. Please log in."
+      );
+    }
+    const id = utilities.getUserIdByToken(token);
 
-  if (req.file) {
-    // @ts-ignore
-    cloudinary.uploader.upload(req.file?.path, async function (err, result) {
-      if (err || !result) {
-        return res.status(500).json({
-          success: false,
-          message: "Error uploading image",
+    if (req.file) {
+      // @ts-ignore
+      cloudinary.uploader.upload(req.file?.path, async function (err, result) {
+        if (err || !result) {
+          return res.status(500).json({
+            success: false,
+            message: "Error uploading image",
+          });
+        }
+        updateData.profileImage = result.secure_url;
+
+        const userDetails = await userService.updateUser(
+          userName,
+          updateData,
+          id
+        );
+        const { password, ...userData } = userDetails;
+
+        sendResponse<IResponse>(res, {
+          statusCode: httpStatus.OK,
+          success: true,
+          message: "User created successfully!",
+          data: userData,
         });
-      }
-      updateData.profileImage = result.secure_url;
-
+      });
+    } else {
       const userDetails = await userService.updateUser(
         userName,
         updateData,
         id
       );
+
+      if (!userDetails) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "User data not updated");
+      }
       const { password, ...userData } = userDetails;
 
-      sendResponse(res, {
+      sendResponse<IResponse>(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "User created successfully!",
+        message: "Users Update successfully",
         data: userData,
       });
-    });
-  } else {
-    const userDetails = await userService.updateUser(userName, updateData, id);
-
-    if (!userDetails) {
-      throw new ApiError(httpStatus.BAD_REQUEST, "User data not updated");
     }
-    const { password, ...userData } = userDetails;
-
-    sendResponse<IResponse>(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "Users Update successfully",
-      data: userData,
-    });
   }
-});
+);
 // Get all users
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   const token = req.headers.authorization;

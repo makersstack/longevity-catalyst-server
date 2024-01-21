@@ -52,12 +52,6 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    company: {
-      type: DataTypes.STRING,
-    },
-    bio: {
-      type: DataTypes.TEXT,
-    },
     profileImage: {
       type: DataTypes.STRING,
       allowNull: true,

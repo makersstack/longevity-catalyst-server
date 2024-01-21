@@ -31,7 +31,7 @@ const getAllSkill = catchAsync(async (req: Request, res: Response) => {
   sendResponse<Skill[]>(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Users retrieved successfully",
+    message: "Skill retrieved successfully",
     data: result,
   });
 });

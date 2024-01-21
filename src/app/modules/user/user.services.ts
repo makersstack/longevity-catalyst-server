@@ -7,7 +7,11 @@ import ApiError from "../../../errors/ApiError";
 import { utilities } from "../../../helpers/utilities";
 import { ProfileFollow } from "../profile/follow/follow.model";
 import { ProfileNotify } from "../profile/notification/notification.model";
-import { ISubscribing, IUser, Subscribing } from "./user.interface";
+import { Skill } from "../skills/skills.model";
+import { UserDetailsInterface } from "./user-details/userDetails.interface";
+import { UserDetails } from "./user-details/userDetails.model";
+import { UserSkill } from "./user-skill/user-skills.model";
+import { IResponse, ISubscribing, IUser, Subscribing } from "./user.interface";
 import { SubscriBing, User } from "./user.model";
 
 const createUser = async (userData: any): Promise<any> => {
@@ -33,11 +37,14 @@ const createUser = async (userData: any): Promise<any> => {
 
   userData.password = hashedPassword;
 
-  await User.create(userData, {
+  const user = await User.create(userData, {
     returning: true,
     plain: true,
     attributes: { exclude: ["password"] },
   });
+  if (user) {
+    await UserDetails.create({ userId: user.id, ...userData });
+  }
 
   return true;
 };
@@ -62,7 +69,10 @@ const updateUser = async (
   updateData: any,
   id: number
 ): Promise<any> => {
-  const user = await User.findOne({ where: { username } });
+  const user = await User.findOne({
+    where: { username },
+    attributes: { exclude: ["password"] },
+  });
 
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "User Not Found");
@@ -71,26 +81,84 @@ const updateUser = async (
   if (id !== user.id) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Mismatching user");
   }
+  let userDetails = await UserDetails.findOne({
+    where: { userId: id },
+  });
+  if (!userDetails) {
+    userDetails = UserDetails.build({ userId: id });
+  }
 
-  const allowedFields: Array<keyof IUser> = [
-    "full_name",
+  const allowedFields: Array<keyof IResponse> = ["full_name", "profileImage"];
+
+  const allowedDetailsFields: Array<keyof UserDetailsInterface> = [
+    "lives_in",
+    "home_state",
+    "github",
+    "portfolio",
     "company",
     "bio",
-    "profileImage",
   ];
-
+  // console.log(updateData);
   if (typeof updateData === "object" && updateData !== null) {
     for (const field of allowedFields) {
       if (field in updateData) {
         (user as any)[field] = updateData[field];
       }
     }
+    for (const field of allowedDetailsFields) {
+      if (field in updateData) {
+        (userDetails as any)[field] = updateData[field];
+      }
+    }
   }
+  const { skills } = updateData;
+  const skillsArray = JSON.parse(skills);
+
+  // Fetch existing skills
+  const existingSkills = await UserSkill.findAll({
+    where: { userId: id },
+    attributes: ["skillId"],
+  });
+  // console.log(existingSkills.skillId);
+
+  const existingSkillsArray = existingSkills.map((skill) => skill.skillId);
+
+  // Identify skills to be added and deleted
+  const skillsToAdd = skillsArray.filter(
+    (skill: any) => !existingSkillsArray.includes(skill)
+  );
+  const skillsToDelete = existingSkillsArray.filter(
+    (skill) => !skillsArray.includes(skill)
+  );
+
+  // Delete skills
+  await UserSkill.destroy({
+    where: { userId: id, skillId: skillsToDelete },
+  });
+
+  // Add new skills
+  await UserSkill.bulkCreate(
+    skillsToAdd.map((skill: any) => ({ userId: id, skillId: skill }))
+  );
 
   await user.save();
-  await user.reload();
+  await userDetails.save();
+  await user.reload({
+    include: [
+      {
+        model: UserDetails,
+        attributes: { exclude: ["createdAt", "updatedAt", "id", "userId"] },
+      },
+      {
+        model: Skill,
+        through: {
+          attributes: [], // Exclude the join table attributes if needed
+        },
+      },
+    ],
+  });
 
-  const updatedUserPlainData = user.toJSON() as IUser;
+  const updatedUserPlainData = user.toJSON() as IResponse;
   return updatedUserPlainData;
 };
 
@@ -102,6 +170,18 @@ const getUserByUserName = async (
   const user = await User.findOne({
     where: { username: userName },
     attributes: { exclude: ["password"] },
+    include: [
+      {
+        model: UserDetails,
+        attributes: { exclude: ["createdAt", "updatedAt", "id", "userId"] },
+      },
+      {
+        model: Skill,
+        through: {
+          attributes: [], // Exclude the join table attributes if needed
+        },
+      },
+    ],
   });
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "User Not Found");
@@ -137,6 +217,7 @@ const getUserByUserName = async (
     isFollow,
     followerCount,
     followingCount,
+    content_view_count: 0,
   };
   // return userPlainData;
 };
@@ -150,12 +231,26 @@ const getUserInfoById = async (userId: number): Promise<IUser | null> => {
     attributes: {
       exclude: ["createdAt", "updatedAt", "password"],
     },
+    include: [
+      {
+        model: UserDetails,
+        attributes: { exclude: ["createdAt", "updatedAt", "id", "userId"] },
+      },
+      {
+        model: Skill,
+        through: {
+          attributes: [], // Exclude the join table attributes if needed
+        },
+      },
+    ],
   });
 
   if (!findUser) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found");
   }
-  const result = findUser.toJSON() as IUser;
+  const result = findUser.toJSON() as IUser & {
+    UserDetails: UserDetailsInterface;
+  };
   return result;
 };
 
