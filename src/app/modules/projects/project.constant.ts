@@ -11,6 +11,7 @@ export const projectFilterableFields = [
   "selectedLanguage",
   "upVoteCount",
   "downVoteCount",
+  "status",
 ];
 
 export const projectSearchableFields = [

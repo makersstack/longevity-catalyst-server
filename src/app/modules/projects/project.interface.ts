@@ -39,6 +39,13 @@ export enum ReadyToStart {
   Other = "Other",
 }
 
+export enum ProjectStatus {
+  Public = "Public",
+  Private = "Private",
+  Draft = "Draft",
+  Pending = "Pending",
+}
+
 export interface ProjectData {
   id: number;
   authorId: number;
@@ -68,6 +75,7 @@ export interface ProjectData {
   relevant_link?: string;
   relevant_literature_link?: string;
   other_included?: string;
+  status?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -80,6 +88,7 @@ export type IProjectFilters = {
   selectedTopic?: string;
   selectedFundingStatus?: string;
   selectedLanguage?: string;
+  status?: string;
 };
 
 export type IApiResponseProjectData = {

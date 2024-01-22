@@ -5,6 +5,7 @@ import { User } from "../user/user.model";
 import { Categories } from "./categories/categories.model";
 
 class Project extends Model {
+  append: any;
   static async findProjectById(id: number) {
     return Project.findByPk(id);
   }
@@ -58,12 +59,15 @@ Project.init(
     },
     project_name: {
       type: DataTypes.STRING,
+      allowNull: true,
     },
     affiliation: {
       type: DataTypes.STRING,
+      allowNull: true,
     },
     project_desc: {
       type: DataTypes.TEXT("long"),
+      allowNull: true,
     },
     project_keywords: {
       type: DataTypes.TEXT("long"),
@@ -71,37 +75,40 @@ Project.init(
     },
     primary_category: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Categories,
-        key: "id",
-      },
+      allowNull: true,
     },
     onsite_work: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+      allowNull: true,
     },
     address: {
       type: DataTypes.STRING,
+      allowNull: true,
     },
     address_line: {
       type: DataTypes.STRING,
+      allowNull: true,
     },
     city_town: {
       type: DataTypes.STRING,
+      allowNull: true,
     },
     state_region_province: {
       type: DataTypes.STRING,
+      allowNull: true,
     },
     zip_code: {
       type: DataTypes.STRING,
+      allowNull: true,
     },
     country: {
       type: DataTypes.STRING,
+      allowNull: true,
     },
     projecType: {
       type: DataTypes.ENUM("Individual", "Team", "Other"),
-      defaultValue: "Other",
+      allowNull: true,
     },
     projectNature: {
       type: DataTypes.ENUM(
@@ -110,7 +117,7 @@ Project.init(
         "Wet Lab",
         "Other"
       ),
-      defaultValue: "Other",
+      allowNull: true,
     },
     projectExperience: {
       type: DataTypes.ENUM(
@@ -120,7 +127,7 @@ Project.init(
         "Advanced",
         "Expert"
       ),
-      defaultValue: "Novice",
+      allowNull: true,
     },
     required_skill_list: {
       type: DataTypes.TEXT("long"),
@@ -133,6 +140,7 @@ Project.init(
     hardDeadline: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+      allowNull: true,
     },
     expectedTimeProject: {
       type: DataTypes.ENUM(
@@ -142,17 +150,18 @@ Project.init(
         "Greater than 3 months",
         "Other"
       ),
-      defaultValue: "Other",
+      allowNull: true,
     },
     haveProjectBudget: {
       type: DataTypes.ENUM(
         "I have a budget",
         "I will require a volunteer / sponsorship"
       ),
-      defaultValue: "I have a budget",
+      allowNull: true,
     },
     expected_cost: {
       type: DataTypes.TEXT("long"),
+      allowNull: true,
     },
     readyToStart: {
       type: DataTypes.ENUM(
@@ -161,7 +170,7 @@ Project.init(
         "Within 2 week",
         "Other"
       ),
-      defaultValue: "Other",
+      allowNull: true,
     },
     final_deliverable_details: {
       type: DataTypes.TEXT("long"),
@@ -176,6 +185,11 @@ Project.init(
     },
     other_included: {
       type: DataTypes.TEXT("long"),
+      allowNull: true,
+    },
+    status: {
+      type: DataTypes.ENUM("Public", "Pending", "Draft", "Private"),
+      allowNull: true,
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -203,4 +217,5 @@ sequelize
 Project.belongsTo(User, { foreignKey: "authorId", onDelete: "CASCADE" });
 Project.belongsTo(Categories, { foreignKey: "primary_category" });
 User.hasMany(Project, { foreignKey: "authorId", onDelete: "CASCADE" });
+
 export { Project };

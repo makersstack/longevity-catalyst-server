@@ -6,6 +6,7 @@ import { paginationHelpers } from "../../../helpers/paginationHelpers";
 import { utilities } from "../../../helpers/utilities";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptons } from "../../../interfaces/pagination";
+import { Skill } from "../skills/skills.model";
 import { User } from "../user/user.model";
 import { Categories } from "./categories/categories.model";
 import { ProjectLike } from "./likeSystem/like.model";
@@ -14,6 +15,7 @@ import {
   IApiResponseProjectData,
   IProjectFilters,
   ProjectData,
+  ProjectStatus,
 } from "./project.interface";
 import { Project } from "./project.model";
 import { ProjectVote } from "./voteSystem/vote.model";
@@ -36,6 +38,7 @@ const createProject = async (
   const authorId: number = userInfo.id;
 
   projectData.authorId = authorId;
+  // projectData.status = ProjectStatus.Public;
 
   const createdProject = await Project.create(
     projectData as IApiResponseProjectData
@@ -158,6 +161,12 @@ const getAllProjects = async (
       primary_category: selectedCategory, // Assuming 'categoryId' is the field to match against
     });
   }
+
+  // get only public project
+  andCondition.push({
+    status: ProjectStatus.Public,
+  });
+
   // console.log(selectedCategory);
   // For Filter
   if (Object.keys(filtersData).length) {
@@ -307,6 +316,7 @@ const getAllProjectsByUsername = async (
     selectedTopic,
     selectedFundingStatus,
     selectedLanguage,
+    status,
     ...filtersData
   } = filters;
   const andCondition = [];
@@ -367,6 +377,12 @@ const getAllProjectsByUsername = async (
   if (selectedCategory) {
     andCondition.push({
       primary_category: selectedCategory, // Assuming 'categoryId' is the field to match against
+    });
+  }
+
+  if (status) {
+    andCondition.push({
+      status,
     });
   }
 
@@ -507,6 +523,17 @@ const getSingleProject = async (projectId: number) => {
   if (!project) {
     throw new ApiError(httpStatus.NOT_FOUND, "Project not found");
   }
+  const { required_skill_list } = project as unknown as {
+    required_skill_list: string;
+  };
+  const requiredSkills = JSON.parse(required_skill_list);
+  const skills = await Skill.findAll({
+    where: {
+      id: requiredSkills,
+    },
+  });
+
+  project.setDataValue("skills", skills);
 
   return project;
 };
