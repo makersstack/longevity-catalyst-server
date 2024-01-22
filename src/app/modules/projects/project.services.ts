@@ -384,6 +384,8 @@ const getAllProjectsByUsername = async (
     andCondition.push({
       status,
     });
+  } else {
+    andCondition.push({ status: "Public" });
   }
 
   // For Filter
