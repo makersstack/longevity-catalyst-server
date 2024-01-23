@@ -9,6 +9,7 @@ import { IPaginationOptons } from "../../../interfaces/pagination";
 import { Skill } from "../skills/skills.model";
 import { User } from "../user/user.model";
 import { Categories } from "./categories/categories.model";
+import Comment from "./comments/comments.model";
 import { ProjectLike } from "./likeSystem/like.model";
 import { projectSearchableFields } from "./project.constant";
 import {
@@ -77,11 +78,6 @@ const deleteProject = async (projectId: string) => {
   }
   return null;
 };
-// For search and filter http://localhost:5000/api/v1/projects?downVoteCount=2&searchTerm=C%20Sample
-
-// Via Sort By and Sort order http://localhost:5000/api/v1/projects?sortBy=upVoteCount&sortOrder=desc
-
-// For sorting Every sorting separeted endpoint and with this filter data it's great point
 
 const getAllProjects = async (
   userToken: string | null,
@@ -97,6 +93,7 @@ const getAllProjects = async (
     selectedTopic,
     selectedFundingStatus,
     selectedLanguage,
+    topFilter,
     ...filtersData
   } = filters;
 
@@ -153,7 +150,9 @@ const getAllProjects = async (
   }
 
   if (selectedRequiredSkills) {
-    return;
+    andCondition.push({
+      status: ProjectStatus.Public,
+    });
   }
 
   if (selectedCategory) {
@@ -166,6 +165,30 @@ const getAllProjects = async (
   andCondition.push({
     status: ProjectStatus.Public,
   });
+  // top filter option view
+  if (topFilter) {
+    if (topFilter === "latest") {
+      andCondition.push({
+        status: ProjectStatus.Public,
+      });
+    } else if (topFilter === "mostView") {
+      andCondition.push({
+        status: ProjectStatus.Public,
+      });
+    } else if (topFilter === "top") {
+      andCondition.push({
+        status: ProjectStatus.Public,
+      });
+    } else if (topFilter === "rising") {
+      andCondition.push({
+        status: ProjectStatus.Public,
+      });
+    } else {
+      andCondition.push({
+        status: ProjectStatus.Public,
+      });
+    }
+  }
 
   // console.log(selectedCategory);
   // For Filter
@@ -232,7 +255,8 @@ const getAllProjects = async (
         where: {
           project_id: projectId, // Filter by the project ID
         },
-        order: [["createdAt", "DESC"]], // Order by createdAt in descending order
+        order: [["createdAt", "DESC"]],
+        // Order by createdAt in descending order
         attributes: ["authorId"], // Select only authorId
       });
 
@@ -260,24 +284,33 @@ const getAllProjects = async (
           project_id: projectId,
         },
       });
+
       const downVote = await ProjectVote.count({
         where: {
           voteType: "down",
           project_id: projectId,
         },
       });
+
       const voteCounts = {
         total: upVote + downVote,
         up: upVote,
         down: downVote,
       };
 
+      const commentsCount = await Comment.count({
+        where: {
+          projectId: projectId,
+        },
+      });
+
       // Add the authors details and total like count to the project data
       return {
-        ...project.toJSON(), // Convert the project to a plain object
-        likedUsers: authors, // Add the authors details as likedUsers
-        totalLikes, // Add the total like count for the project
+        ...project.toJSON(),
+        likedUsers: authors,
+        totalLikes,
         voteCounts: voteCounts,
+        commentsCount,
       };
     })
   );
@@ -317,6 +350,7 @@ const getAllProjectsByUsername = async (
     selectedFundingStatus,
     selectedLanguage,
     status,
+    topFilter,
     ...filtersData
   } = filters;
   const andCondition = [];
@@ -371,7 +405,9 @@ const getAllProjectsByUsername = async (
   }
 
   if (selectedRequiredSkills) {
-    return;
+    andCondition.push({
+      status: ProjectStatus.Public,
+    });
   }
 
   if (selectedCategory) {
@@ -386,6 +422,31 @@ const getAllProjectsByUsername = async (
     });
   } else {
     andCondition.push({ status: "Public" });
+  }
+
+  // top filter option view
+  if (topFilter) {
+    if (topFilter === "latest") {
+      andCondition.push({
+        status: ProjectStatus.Public,
+      });
+    } else if (topFilter === "mostView") {
+      andCondition.push({
+        status: ProjectStatus.Public,
+      });
+    } else if (topFilter === "top") {
+      andCondition.push({
+        status: ProjectStatus.Public,
+      });
+    } else if (topFilter === "rising") {
+      andCondition.push({
+        status: ProjectStatus.Public,
+      });
+    } else {
+      andCondition.push({
+        status: ProjectStatus.Public,
+      });
+    }
   }
 
   // For Filter
@@ -469,24 +530,32 @@ const getAllProjectsByUsername = async (
           project_id: projectId,
         },
       });
+
       const downVote = await ProjectVote.count({
         where: {
           voteType: "down",
           project_id: projectId,
         },
       });
+
       const voteCounts = {
         total: upVote + downVote,
         up: upVote,
         down: downVote,
       };
+      const commentsCount = await Comment.count({
+        where: {
+          projectId: projectId,
+        },
+      });
 
       // Add the authors details and total like count to the project data
       return {
-        ...project.toJSON(), // Convert the project to a plain object
-        likedUsers: authors, // Add the authors details as likedUsers
-        totalLikes, // Add the total like count for the project
+        ...project.toJSON(),
+        likedUsers: authors,
+        totalLikes,
         voteCounts: voteCounts,
+        commentsCount,
       };
     })
   );

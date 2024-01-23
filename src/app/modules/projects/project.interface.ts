@@ -89,6 +89,7 @@ export type IProjectFilters = {
   selectedFundingStatus?: string;
   selectedLanguage?: string;
   status?: string;
+  topFilter?: string;
 };
 
 export type IApiResponseProjectData = {
